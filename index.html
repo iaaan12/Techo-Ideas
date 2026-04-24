@@ -331,17 +331,18 @@
 
         .tabs {
             display: flex;
-            gap: 1.5rem;
+            gap: 0.75rem;
+            flex-wrap: wrap;
             border-bottom: 1px solid rgba(13, 27, 42, 0.1);
             padding-bottom: 0.25rem;
             margin-bottom: 1.25rem;
         }
         .tab-btn {
-            font-size: 0.875rem;
+            font-size: 0.8rem;
             font-weight: 700;
             background: none;
             border: none;
-            padding: 0 0.5rem 0.5rem 0.5rem;
+            padding: 0 0.25rem 0.5rem 0.25rem;
             color: var(--text-muted);
             cursor: pointer;
             border-bottom: 2px solid transparent;
@@ -677,6 +678,97 @@
             to { transform: translateY(0); opacity: 1; }
         }
 
+        [data-theme="dark"] {
+            --bg-cream: #18181b; 
+            --bg-striped: #27272a;
+            --text-dark: #f4f4f5;
+            --text-muted: #a1a1aa;
+            --white: #27272a;
+            --techo-black: #09090b;
+            --shadow-brutal: 4px 4px 0px 0px rgba(0,0,0,1);
+            --shadow-brutal-hover: 2px 2px 0px 0px rgba(0,0,0,1);
+            --border-thick: 3px solid var(--techo-black);
+        }
+        
+        [data-theme="dark"] body {
+            background-image: radial-gradient(#3f3f46 1px, transparent 1px);
+        }
+
+        [data-theme="dark"] input, 
+        [data-theme="dark"] select, 
+        [data-theme="dark"] textarea {
+            background: var(--bg-cream);
+            color: var(--text-dark);
+        }
+
+        [data-theme="dark"] .badge-content { background: #3f3f46; color: #fff; }
+        
+        /* Thematic Loading Loader */
+        .thematic-loader {
+            display: none;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            padding: 2rem;
+            background: var(--white);
+            border: var(--border-thick);
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow-brutal);
+            margin-bottom: 2rem;
+            text-align: center;
+        }
+
+        .thematic-loader.active {
+            display: flex;
+        }
+
+        .house-builder {
+            position: relative;
+            width: 80px;
+            height: 80px;
+            margin-bottom: 1rem;
+        }
+
+        .brick {
+            background-color: var(--techo-blue);
+            border: 2px solid var(--techo-black);
+            position: absolute;
+            opacity: 0;
+            animation: build-house 2.5s infinite;
+        }
+
+        .brick-1 { width: 40px; height: 16px; bottom: 0; left: 20px; animation-delay: 0s; }
+        .brick-2 { width: 24px; height: 16px; bottom: 16px; left: 10px; animation-delay: 0.3s; }
+        .brick-3 { width: 24px; height: 16px; bottom: 16px; right: 10px; animation-delay: 0.6s; }
+        .brick-4 { width: 50px; height: 16px; bottom: 32px; left: 15px; animation-delay: 0.9s; }
+        
+        .roof {
+            width: 0;
+            height: 0;
+            border-left: 36px solid transparent;
+            border-right: 36px solid transparent;
+            border-bottom: 30px solid var(--techo-accent);
+            position: absolute;
+            bottom: 48px;
+            left: 4px;
+            opacity: 0;
+            animation: build-roof 2.5s infinite;
+            animation-delay: 1.2s;
+            filter: drop-shadow(0px -2px 0px var(--techo-black)) drop-shadow(2px 2px 0px var(--techo-black)) drop-shadow(-2px 2px 0px var(--techo-black));
+        }
+
+        @keyframes build-house {
+            0%, 15% { opacity: 0; transform: translateY(-10px); }
+            20%, 80% { opacity: 1; transform: translateY(0); }
+            100% { opacity: 0; }
+        }
+
+        @keyframes build-roof {
+            0%, 30% { opacity: 0; transform: translateY(-20px); }
+            40%, 80% { opacity: 1; transform: translateY(0); }
+            100% { opacity: 0; }
+        }
+
         /* Responsive */
         @media (max-width: 800px) {
             html, body { height: auto; min-height: 100vh; overflow-y: auto; overflow-x: hidden; }
@@ -693,6 +785,8 @@
             .mockup-container { width: 100%; max-width: 320px; }
         }
     </style>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 </head>
 <body>
     <div class="app-container">
@@ -705,6 +799,10 @@
                 </div>
             </h1>
             <div class="header-actions">
+                <button class="btn btn-outline" onclick="toggleTheme()" id="themeToggle" style="padding: 0.5rem; width: 36px; height: 36px; display:flex; justify-content:center; align-items:center;" aria-label="Toggle Dark Mode" title="Cambiar Tema">
+                    <svg id="themeIconDark" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:none;"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+                    <svg id="themeIconLight" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
+                </button>
                 <span id="apiStatus" class="api-badge missing">Sin API Key</span>
                 <button class="btn btn-outline" onclick="openConfigModal()">
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right:4px"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg> Acceder
@@ -718,6 +816,7 @@
                     <div class="tabs">
                         <button class="tab-btn active" onclick="switchMainTab('generador')" id="tabGenerador">Generador</button>
                         <button class="tab-btn" onclick="switchMainTab('historial')" id="tabHistorial">Historial</button>
+                        <button class="tab-btn" onclick="switchMainTab('favoritos')" id="tabFavoritos">Favoritos</button>
                     </div>
 
                     <div id="panelGenerador" class="tab-content active">
@@ -780,8 +879,24 @@
                     <div id="panelHistorial" class="tab-content">
                         <div id="historialList"></div>
                     </div>
+
+                    <div id="panelFavoritos" class="tab-content">
+                        <div id="favoritosList"></div>
+                    </div>
                 </div>
             </aside>
+
+            <div id="thematicLoader" class="thematic-loader">
+                <div class="house-builder">
+                    <div class="brick brick-1"></div>
+                    <div class="brick brick-2"></div>
+                    <div class="brick brick-3"></div>
+                    <div class="brick brick-4"></div>
+                    <div class="roof"></div>
+                </div>
+                <h3 style="margin-bottom: 0.5rem; color: var(--techo-blue);">Construyendo Ideas...</h3>
+                <p id="thematicLoadingText" style="color: var(--text-muted); font-size: 0.9rem;">Preparando materiales...</p>
+            </div>
 
             <section class="content-area" id="resultadosContainer">
                 <div class="card" style="text-align: center; color: var(--text-muted); padding: 4rem 2rem;">
@@ -790,6 +905,19 @@
                 </div>
             </section>
         </main>
+    </div>
+
+    <!-- Modal Compartir/Votar -->
+    <div id="sharedIdeaModal" class="modal-overlay">
+        <div class="modal-content" style="max-width: 600px; max-height: 90vh; overflow-y: auto;">
+            <div class="modal-header" style="position: sticky; top: 0; background: var(--white); z-index: 10; border-bottom: 3px solid var(--techo-black);">
+                <h2>💡 Ideas de la Comunidad</h2>
+                <button class="close-btn" onclick="closeSharedModal()">×</button>
+            </div>
+            <div class="modal-body" id="sharedIdeaBody" style="padding: 1.5rem; text-align: left;">
+                <div style="text-align: center; color: var(--text-muted);">Cargando idea...</div>
+            </div>
+        </div>
     </div>
 
     <!-- Modal Configuración -->
@@ -916,7 +1044,36 @@
         // --- Estado Global ---
         let currentMode = 'libre'; // 'libre' o 'tema'
         let history = JSON.parse(localStorage.getItem('techo_history')) || [];
+        let favoritos = JSON.parse(localStorage.getItem('techo_favoritos')) || [];
         
+        let theme = localStorage.getItem('techo_theme') || 'light';
+        function initTheme() {
+            if (theme === 'dark') {
+                document.documentElement.setAttribute('data-theme', 'dark');
+                document.getElementById('themeIconDark').style.display = 'block';
+                document.getElementById('themeIconLight').style.display = 'none';
+            } else {
+                document.documentElement.removeAttribute('data-theme');
+                document.getElementById('themeIconDark').style.display = 'none';
+                document.getElementById('themeIconLight').style.display = 'block';
+            }
+        }
+        
+        function toggleTheme() {
+            if (theme === 'light') {
+                theme = 'dark';
+                document.documentElement.setAttribute('data-theme', 'dark');
+                document.getElementById('themeIconDark').style.display = 'block';
+                document.getElementById('themeIconLight').style.display = 'none';
+            } else {
+                theme = 'light';
+                document.documentElement.removeAttribute('data-theme');
+                document.getElementById('themeIconDark').style.display = 'none';
+                document.getElementById('themeIconLight').style.display = 'block';
+            }
+            localStorage.setItem('techo_theme', theme);
+        }
+
         let config = JSON.parse(localStorage.getItem('techo_config')) || {
             provider: 'nvidia',
             baseUrl: 'https://integrate.api.nvidia.com/v1',
@@ -966,8 +1123,13 @@
         function switchMainTab(tab) {
             document.getElementById('tabGenerador').classList.toggle('active', tab === 'generador');
             document.getElementById('tabHistorial').classList.toggle('active', tab === 'historial');
+            document.getElementById('tabFavoritos').classList.toggle('active', tab === 'favoritos');
             document.getElementById('panelGenerador').classList.toggle('active', tab === 'generador');
             document.getElementById('panelHistorial').classList.toggle('active', tab === 'historial');
+            document.getElementById('panelFavoritos').classList.toggle('active', tab === 'favoritos');
+            if (tab === 'favoritos') {
+                renderFavoritos();
+            }
         }
 
         // --- Config Modal ---
@@ -1135,27 +1297,33 @@
             
             // Start Loading UX
             errorMsg.style.display = 'none';
+            document.getElementById('resultadosContainer').style.display = 'none';
+            document.getElementById('thematicLoader').classList.add('active');
             
             const loadingMessages = [
-                "Analizando conceptos comunitarios...",
+                "Cimentando ideas solidarias...",
+                "Levantando los pilares del mensaje...",
                 "Estructurando copys efectivos...",
-                "Buscando los mejores hashtags...",
-                "Ajustando el tono de la marca...",
-                "Casi listo..."
+                "Construyendo la identidad visual...",
+                "Poniendo el techo de la creatividad...",
+                "¡Casi listo!"
             ];
             
             let messageIndex = 0;
             const originalBtnContent = btnContent.innerHTML;
             
-            btnContent.innerHTML = `<svg class="loader-svg animate-spin" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="animation: spin 1s linear infinite;"><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg> <span id="loadingText">Conectando con la IA...</span>`;
+            btnContent.innerHTML = `<svg class="loader-svg animate-spin" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="animation: spin 1s linear infinite;"><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg> <span>Generando...</span>`;
             
+            const thematicTextEl = document.getElementById('thematicLoadingText');
+            thematicTextEl.textContent = loadingMessages[0];
+            messageIndex++;
+
             const loadingInterval = setInterval(() => {
-                const textEl = document.getElementById('loadingText');
-                if(textEl) {
-                    textEl.textContent = loadingMessages[messageIndex % loadingMessages.length];
+                if(thematicTextEl) {
+                    thematicTextEl.textContent = loadingMessages[messageIndex % loadingMessages.length];
                     messageIndex++;
                 }
-            }, 2500);
+            }, 2000);
 
             let promptUser = `Quiero ${cantidad} ideas de contenido para ${red}.
 Tipos permitidos: ${tiposSeleccionados.join(', ')}.
@@ -1334,13 +1502,24 @@ Reglas hiper estrictas por formato:
                 clearInterval(loadingInterval);
                 btn.disabled = false;
                 btnContent.innerHTML = originalBtnContent;
+                document.getElementById('thematicLoader').classList.remove('active');
             }
         }
 
         function displayResultados(ideas) {
             currentIdeasGlobal = ideas;
             const container = document.getElementById('resultadosContainer');
-            container.innerHTML = '<h2>Ideas Generadas</h2>';
+            container.style.display = 'block';
+            container.innerHTML = `
+                <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:1rem; margin-bottom: 1.5rem; column-span:all;">
+                    <h2 style="margin:0;">Ideas Generadas</h2>
+                    <div style="display:flex; gap:0.5rem;">
+                        <button class="btn btn-outline btn-small" onclick="compartirGeneracion()"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right:2px; vertical-align:-2px;"><circle cx="18" cy="5" r="3"></circle><circle cx="6" cy="12" r="3"></circle><circle cx="18" cy="19" r="3"></circle><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line></svg> Compartir Todas</button>
+                        <button class="btn btn-outline btn-small" onclick="exportarTexto()">📄 Obtener Texto</button>
+                        <button class="btn btn-primary btn-small" style="padding: 0.5rem 1rem; font-size: 0.875rem;" onclick="exportarPDF()">⬇️ Descargar PDF</button>
+                    </div>
+                </div>
+            `;
 
             ideas.forEach((idea, index) => {
                 const card = document.createElement('div');
@@ -1372,7 +1551,7 @@ Reglas hiper estrictas por formato:
                                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right:4px;vertical-align:-3px"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg> Copy / Texto
                                 <button class="btn btn-outline btn-small" style="margin-left:auto" onclick="copyToClipboard(this)">Copiar Copia</button>
                             </div>
-                            <div class="idea-copy" data-copy-text="${idea.copy.replace(/"/g, '&quot;')}">${idea.copy}</div>
+                            <div class="idea-copy" data-copy-text="${(idea.copy || '').replace(/"/g, '&quot;')}">${idea.copy || ''}</div>
                         </div>
 
                         <div class="idea-section" style="margin-bottom:0">
@@ -1380,6 +1559,13 @@ Reglas hiper estrictas por formato:
                                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right:4px;vertical-align:-3px"><circle cx="13.5" cy="6.5" r=".5"/><circle cx="17.5" cy="10.5" r=".5"/><circle cx="8.5" cy="7.5" r=".5"/><circle cx="6.5" cy="12.5" r=".5"/><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10c.926 0 1.648-.746 1.648-1.688 0-.437-.18-.835-.437-1.125-.29-.289-.438-.652-.438-1.125a1.64 1.64 0 0 1 1.668-1.668h1.996c3.051 0 5.555-2.503 5.555-5.554C21.965 6.012 17.461 2 12 2z"/></svg> Descrip. Visual
                             </div>
                             <p style="font-size:0.95rem; color:var(--text-muted)">${idea.visual}</p>
+                        </div>
+
+                        <div class="idea-actions" style="margin-top: 1.5rem; border-top: 1px dashed var(--border-color); padding-top: 1rem; display: flex; justify-content: flex-end;">
+                            <button class="btn btn-outline btn-small" onclick="guardarIdeaFavorita(${index})">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                                Guardar Idea
+                            </button>
                         </div>
                     </div>
                 `;
@@ -1401,7 +1587,7 @@ Reglas hiper estrictas por formato:
             });
         }
 
-        // --- Historial ---
+        // --- Historial y Favoritos ---
         function saveToHistory(entry) {
             history.unshift(entry);
             if(history.length > 30) history = history.slice(0, 30);
@@ -1454,6 +1640,113 @@ Reglas hiper estrictas por formato:
             });
         }
         
+        async function compartirGeneracion() {
+            if (!currentIdeasGlobal || currentIdeasGlobal.length === 0) {
+                alert('No hay ideas para compartir.');
+                return;
+            }
+            
+            try {
+                const response = await fetch('/api/ideas/share', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ idea: currentIdeasGlobal })
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    const shareUrl = `${window.location.origin}${window.location.pathname}?shared=${data.id}`;
+                    
+                    try {
+                        await navigator.clipboard.writeText(shareUrl);
+                        alert('¡Enlace copiado al portapapeles! Compartilo para que otros voten tus ideas.');
+                    } catch (err) {
+                        alert(`Enlace para compartir: \n${shareUrl}`);
+                    }
+                } else {
+                    alert('Hubo un error al generar el enlace de compartir.');
+                }
+            } catch (err) {
+                console.error('Error sharing:', err);
+                alert('No se pudo conectar al servidor para compartir.');
+            }
+        }
+
+        // --- Favoritos Logic ---
+
+        function guardarIdeaFavorita(index) {
+            const idea = currentIdeasGlobal[index];
+            const ideaStr = JSON.stringify(idea);
+            
+            if (favoritos.some(f => JSON.stringify(f.idea) === ideaStr)) {
+                alert('Esta idea ya está en Favoritos.');
+                return;
+            }
+            
+            favoritos.unshift({ idea: idea, fecha: Date.now() });
+            localStorage.setItem('techo_favoritos', JSON.stringify(favoritos));
+            alert('¡Idea guardada en Favoritos!');
+            if (document.getElementById('tabFavoritos').classList.contains('active')) {
+                renderFavoritos();
+            }
+        }
+
+        function eliminarFavorito(event, index) {
+            event.preventDefault();
+            event.stopPropagation();
+            favoritos.splice(index, 1);
+            localStorage.setItem('techo_favoritos', JSON.stringify(favoritos));
+            renderFavoritos();
+        }
+
+        function renderFavoritos() {
+            const list = document.getElementById('favoritosList');
+            if(favoritos.length === 0) {
+                list.innerHTML = '<p style="color:var(--text-muted); font-size:0.9rem;">No tienes ideas guardadas en favoritos.</p>';
+                return;
+            }
+
+            list.innerHTML = '';
+            favoritos.forEach((entry, i) => {
+                const date = new Date(entry.fecha);
+                const title = `Idea Guardada - ${entry.idea.tipo.toUpperCase()}`;
+                
+                const item = document.createElement('div');
+                item.className = 'history-item';
+                item.style.cursor = 'pointer';
+                item.onclick = () => {
+                    document.getElementById('tabGenerador').click(); 
+                    displayResultados([entry.idea]);
+                    if(window.innerWidth <= 800) {
+                        document.getElementById('resultadosContainer').scrollIntoView({behavior: 'smooth'});
+                    }
+                };
+                
+                let cx = 'badge-post';
+                if(entry.idea.tipo.includes('carrusel')) cx = 'badge-carousel';
+                if(entry.idea.tipo.includes('reel')) cx = 'badge-reel';
+                if(entry.idea.tipo.includes('story')) cx = 'badge-story';
+
+                item.innerHTML = `
+                    <div style="display:flex; justify-content:space-between; align-items:start;">
+                        <div class="history-meta">
+                            <span>${date.toLocaleDateString()}</span>
+                            <span style="font-weight:bold; color:var(--techo-blue)">${entry.idea.red}</span>
+                        </div>
+                        <button class="btn btn-outline" style="padding: 2px 6px; font-size:10px; border-color:var(--error); color:var(--error);" title="Eliminar" onclick="eliminarFavorito(event, ${i})">❌</button>
+                    </div>
+                    <div style="font-weight:500; margin-bottom:8px;">${title}</div>
+                    <div style="width: 100%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-size: 0.8rem; color: var(--text-muted); margin-bottom: 8px;">
+                        ${entry.idea.concepto}
+                    </div>
+                    <div style="display:flex; flex-wrap:wrap; gap:4px; margin-top:5px;">
+                        <span class="badge ${cx}" style="margin-right:4px;">${entry.idea.tipo}</span>
+                    </div>
+                `;
+                list.appendChild(item);
+            });
+        }
+
         let currentIdeasGlobal = [];
         
         function openPreviewMockup(index) {
@@ -1547,6 +1840,233 @@ Reglas hiper estrictas por formato:
             
             modal.style.display = 'flex';
         }
+        function exportarTexto() {
+            if (!currentIdeasGlobal || currentIdeasGlobal.length === 0) {
+                alert('No hay ideas para exportar.');
+                return;
+            }
+            
+            let contenido = "IDEAS GENERADAS - TECHO LAB\n\n";
+            currentIdeasGlobal.forEach((idea, index) => {
+                contenido += `--- IDEA #${index + 1} | ${idea.tipo.toUpperCase()} (${idea.red}) ---\n\n`;
+                contenido += `CONCEPTO:\n${idea.concepto}\n\n`;
+                if(idea.copy && idea.copy.trim() !== "") {
+                    contenido += `COPY (TEXTO):\n${idea.copy}\n\n`;
+                }
+                contenido += `VISUAL:\n${idea.visual}\n\n`;
+            });
+            
+            const blob = new Blob([contenido], { type: 'text/plain;charset=utf-8' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'techo_ideas.txt';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        }
+
+        async function exportarPDF() {
+            if (!currentIdeasGlobal || currentIdeasGlobal.length === 0) {
+                alert('No hay ideas para exportar.');
+                return;
+            }
+
+            const container = document.getElementById('resultadosContainer');
+            const target = document.createElement('div');
+            
+            // Create a clean aesthetic container off-screen for the PDF
+            target.style.position = 'absolute';
+            target.style.top = '-9999px';
+            target.style.left = '-9999px';
+            target.style.width = '800px'; 
+            target.style.backgroundColor = '#F0ECE3';
+            target.style.padding = '40px';
+            target.style.fontFamily = "'Inter', sans-serif";
+            target.style.color = '#111827';
+            
+            let contentHTML = `
+                <div style="border: 3px solid #111827; background: #fff; border-radius: 8px; padding: 30px; box-shadow: 8px 8px 0px 0px #111827; margin-bottom: 30px;">
+                    <div style="display: flex; align-items: center; justify-content: space-between; border-bottom: 2px solid #efefef; padding-bottom: 20px; margin-bottom: 20px;">
+                        <div>
+                            <h1 style="color: #0092DD; font-family: 'Fredoka', sans-serif; font-size: 28px; margin: 0;">Plan de Contenidos</h1>
+                            <p style="color: #3f4851; margin: 5px 0 0 0; font-size: 14px;">Generador TECHO Lab</p>
+                        </div>
+                        <img src="https://argentina.techo.org/wp-content/uploads/sites/8/2026/04/Capa_1-1-1.svg" style="height: 40px;">
+                    </div>
+            `;
+            
+            currentIdeasGlobal.forEach((idea, index) => {
+                contentHTML += `
+                    <div style="margin-bottom: 30px; padding: 20px; background: #f9f9f9; border: 2px solid #111827; border-radius: 8px;">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                            <h2 style="font-family: 'Fredoka', sans-serif; font-size: 20px; margin: 0; display: inline-block; background: #FFD100; padding: 4px 10px; border-radius: 4px; border: 2px solid #111827;">#${index+1} - ${idea.tipo.toUpperCase()}</h2>
+                            <span style="font-size: 12px; font-weight: bold; background: #0092DD; color: white; padding: 4px 8px; border-radius: 4px;">${idea.red}</span>
+                        </div>
+                        
+                        <h3 style="font-size: 14px; text-transform: uppercase; color: #0092DD; margin: 0 0 5px 0;">Concepto</h3>
+                        <p style="margin: 0 0 15px 0; font-size: 14px;">${idea.concepto.replace(/\\n/g, '<br>')}</p>
+                        
+                        ${idea.copy ? `
+                        <h3 style="font-size: 14px; text-transform: uppercase; color: #0092DD; margin: 0 0 5px 0;">Texto / Copy</h3>
+                        <p style="margin: 0 0 15px 0; font-size: 14px; white-space: pre-wrap;">${idea.copy.replace(/\\n/g, '<br>')}</p>
+                        ` : ''}
+                        
+                        <h3 style="font-size: 14px; text-transform: uppercase; color: #0092DD; margin: 0 0 5px 0;">Visual</h3>
+                        <p style="margin: 0 0 10px 0; font-size: 14px; color: #555;">${idea.visual.replace(/\\n/g, '<br>')}</p>
+                    </div>
+                `;
+            });
+            
+            contentHTML += `
+                </div>
+            `;
+            
+            target.innerHTML = contentHTML;
+            document.body.appendChild(target);
+            
+            try {
+                // Ensure the fonts are loaded
+                await document.fonts.ready;
+                
+                const canvas = await html2canvas(target, {
+                    scale: 2,
+                    useCORS: true,
+                    logging: false,
+                    backgroundColor: '#F0ECE3'
+                });
+                
+                const imgData = canvas.toDataURL('image/png');
+                
+                // Assuming jsPDF is loaded globally
+                const { jsPDF } = window.jspdf;
+                
+                // Calculate PDF dimensions to fit the whole canvas content nicely
+                const pdfWidth = document.body.clientWidth > 800 ? 210 : 210; // A4 width in mm
+                const ratio = canvas.height / canvas.width;
+                const pdfHeight = pdfWidth * ratio; // Proportional height
+                
+                // standard A4 size is 210 x 297mm. If it's taller, we can create a custom page size or multiple pages
+                // Create a single long page PDF instead of splitting, as it's cleaner for digital distribution
+                const pdf = new jsPDF({
+                    orientation: 'portrait',
+                    unit: 'mm',
+                    format: [pdfWidth, pdfHeight]
+                });
+                
+                pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
+                pdf.save('techo_ideas.pdf');
+                
+            } catch (err) {
+                console.error("Error generando PDF:", err);
+                alert("Hubo un error al generar el PDF. Asegurate de intentar descargar como Texto.");
+            } finally {
+                document.body.removeChild(target);
+            }
+        }
+
+        let currentSharedIdeaId = null;
+
+        async function initSharedIdea() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const sharedId = urlParams.get('shared');
+            if (sharedId) {
+                document.getElementById('sharedIdeaModal').classList.add('active');
+                currentSharedIdeaId = sharedId;
+                
+                try {
+                    const response = await fetch(`/api/ideas/${sharedId}`);
+                    if (!response.ok) throw new Error('Generación no encontrada');
+                    const data = await response.json();
+                    
+                    const ideas = Array.isArray(data.idea) ? data.idea : [data.idea];
+                    const votes = Array.isArray(data.votes) ? data.votes : Array(ideas.length).fill(data.votes || 0);
+                    
+                    let htmlList = '<p style="color:var(--text-muted); margin-bottom: 1.5rem; text-align: center;">Elige tu idea favorita de esta generación.</p>';
+                    ideas.forEach((idea, index) => {
+                        let badgeClass = 'badge-post';
+                        const tipoLower = idea.tipo.toLowerCase();
+                        if(tipoLower.includes('carrusel')) badgeClass = 'badge-carousel';
+                        if(tipoLower.includes('reel') || tipoLower.includes('tiktok') || tipoLower.includes('short')) badgeClass = 'badge-reel';
+                        if(tipoLower.includes('story') || tipoLower.includes('historia')) badgeClass = 'badge-story';
+                        
+                        htmlList += `
+                            <div style="margin-bottom: 2rem; padding-bottom: 1.5rem; border-bottom: 2px dashed var(--border-color);">
+                                <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:1rem;">
+                                    <h3 style="margin:0; font-family:var(--font-headings); font-size:1.2rem; color:var(--techo-blue)">${idea.red}</h3>
+                                    <span class="badge ${badgeClass}">${idea.tipo}</span>
+                                </div>
+                                <p style="font-weight:600; margin-bottom:0.75rem;">Concepto: <span style="font-weight:normal;">${idea.concepto}</span></p>
+                                ${idea.copy ? `<p style="font-weight:600; margin-bottom:0.75rem;">Texto / Copy: <span style="font-weight:normal; white-space:pre-wrap;">${idea.copy}</span></p>` : ''}
+                                <p style="font-weight:600; margin-bottom:1rem;">Visual / Audio: <span style="font-weight:normal;">${idea.visual}</span></p>
+                                <div style="text-align: right;">
+                                    <button id="btnVotar-${index}" class="btn btn-outline btn-small" onclick="votarIdea(${index})" style="font-size: 0.9rem; padding: 0.5rem 1rem;">
+                                        👍 Votar Idea <span id="votosCount-${index}" class="badge badge-content" style="background:var(--techo-black); color:var(--white); margin-left:8px;">${votes[index] || 0}</span>
+                                    </button>
+                                </div>
+                            </div>
+                        `;
+                    });
+
+                    document.getElementById('sharedIdeaBody').innerHTML = htmlList;
+
+                    const votedIndex = localStorage.getItem(`voted_${sharedId}`);
+                    if (votedIndex !== null) {
+                        ideas.forEach((_, index) => {
+                            const btnVotar = document.getElementById(`btnVotar-${index}`);
+                            if (btnVotar) btnVotar.disabled = true;
+                            if (index == votedIndex && btnVotar) {
+                                btnVotar.innerHTML = `✅ Votaste esta idea <span id="votosCount-${index}" class="badge badge-content" style="background:#fff; color:#000; margin-left:8px;">${votes[index]}</span>`;
+                            }
+                        });
+                    }
+                } catch (e) {
+                    document.getElementById('sharedIdeaBody').innerHTML = `<p style="color:var(--error); text-align:center;">${e.message}</p>`;
+                }
+            }
+        }
+
+        async function votarIdea(index) {
+            if (!currentSharedIdeaId) return;
+            
+            const buttons = document.querySelectorAll('button[id^="btnVotar-"]');
+            buttons.forEach(btn => btn.disabled = true);
+            
+            try {
+                const response = await fetch(`/api/ideas/${currentSharedIdeaId}/vote/${index}`, { method: 'POST' });
+                if (response.ok) {
+                    const data = await response.json();
+                    localStorage.setItem(`voted_${currentSharedIdeaId}`, index);
+                    
+                    buttons.forEach((btn, i) => {
+                        if (i === index) {
+                            btn.innerHTML = `✅ Votaste esta idea <span id="votosCount-${i}" class="badge badge-content" style="background:#fff; color:#000; margin-left:8px;">${data.votes[i]}</span>`;
+                        } else {
+                            const badge = document.getElementById(`votosCount-${i}`);
+                            if (badge) badge.innerText = data.votes[i] || 0;
+                        }
+                    });
+                } else {
+                    throw new Error('Error al votar');
+                }
+            } catch (e) {
+                console.error('Error voting:', e);
+                buttons.forEach(btn => btn.disabled = false);
+                alert('No se pudo enviar el voto.');
+            }
+        }
+
+        function closeSharedModal() {
+            document.getElementById('sharedIdeaModal').classList.remove('active');
+            const url = new URL(window.location);
+            url.searchParams.delete('shared');
+            window.history.pushState({}, '', url);
+        }
+
+        // Initialize Theme and Shared on Load
+        initTheme();
+        initSharedIdea();
     </script>
     
     <!-- Mockup Modal -->

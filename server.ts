@@ -1,10 +1,20 @@
 import express from "express";
 import { createServer as createViteServer } from "vite";
 import path from "path";
+import crypto from "crypto";
+import fs from "fs/promises";
 
 async function startServer() {
   const app = express();
   const PORT = 3000;
+  const DATA_FILE = path.join(process.cwd(), 'database.json');
+
+  // Ensure DB file exists
+  try {
+    await fs.access(DATA_FILE);
+  } catch (e) {
+    await fs.writeFile(DATA_FILE, JSON.stringify({ ideas: {} }));
+  }
 
   // Use increased limit to allow potentially large inputs just in case
   app.use(express.json({ limit: '10mb' }));
@@ -37,6 +47,75 @@ async function startServer() {
       res.status(500).json({ error: { message: error instanceof Error ? error.message : "Proxy fetch failed" } });
     }
   });
+
+  // --- Ideas Sharing API ---
+  app.post("/api/ideas/share", async (req, res) => {
+    try {
+      const { idea } = req.body;
+      const id = crypto.randomUUID();
+      const rawData = await fs.readFile(DATA_FILE, 'utf-8');
+      const db = JSON.parse(rawData);
+      
+      const ideasArray = Array.isArray(idea) ? idea : [idea];
+      db.ideas[id] = {
+        idea: ideasArray,
+        votes: ideasArray.map(() => 0),
+        createdAt: Date.now()
+      };
+      
+      await fs.writeFile(DATA_FILE, JSON.stringify(db, null, 2));
+      res.json({ id });
+    } catch (e) {
+      console.error(e);
+      res.status(500).json({ error: 'Failed to share idea' });
+    }
+  });
+
+  app.get("/api/ideas/:id", async (req, res) => {
+    try {
+      const id = req.params.id;
+      const rawData = await fs.readFile(DATA_FILE, 'utf-8');
+      const db = JSON.parse(rawData);
+      
+      if (db.ideas[id]) {
+        res.json(db.ideas[id]);
+      } else {
+        res.status(404).json({ error: 'Idea not found' });
+      }
+    } catch (e) {
+      res.status(500).json({ error: 'Failed to get idea' });
+    }
+  });
+
+  app.post("/api/ideas/:id/vote/:ideaIndex", async (req, res) => {
+    try {
+      const { id, ideaIndex } = req.params;
+      const idx = parseInt(ideaIndex, 10);
+      const rawData = await fs.readFile(DATA_FILE, 'utf-8');
+      const db = JSON.parse(rawData);
+      
+      if (db.ideas[id]) {
+        // Ensure votes is an array (migration for older data)
+        if (!Array.isArray(db.ideas[id].votes)) {
+            const ideasArray = Array.isArray(db.ideas[id].idea) ? db.ideas[id].idea : [db.ideas[id].idea];
+            db.ideas[id].votes = ideasArray.map(() => 0);
+        }
+        
+        if (db.ideas[id].votes[idx] !== undefined) {
+             db.ideas[id].votes[idx] += 1;
+             await fs.writeFile(DATA_FILE, JSON.stringify(db, null, 2));
+             res.json({ votes: db.ideas[id].votes });
+        } else {
+             res.status(404).json({ error: 'Idea index not found' });
+        }
+      } else {
+        res.status(404).json({ error: 'Idea generation not found' });
+      }
+    } catch (e) {
+      res.status(500).json({ error: 'Failed to vote' });
+    }
+  });
+  // -----------------------
 
   if (process.env.NODE_ENV !== "production") {
     // Development mode: integration with Vite
