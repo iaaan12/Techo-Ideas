@@ -21,25 +21,25 @@ async function ensureDb() {
   }
 }
 
-// Vercel Serverless Functions automatically parse the body.
-if (!isVercel) {
-  app.use(express.json({ limit: '10mb' }));
-} else {
-  // On Vercel, ensure req.body defaults to an object if undefined
-  app.use((req, res, next) => {
-    req.body = req.body || {};
-    next();
-  });
-}
+// Use increased limit to allow potentially large inputs just in case
+app.use(express.json({ limit: '10mb' }));
+app.use(express.urlencoded({ limit: '10mb', extended: true }));
+
+app.get("/api/ping", (req, res) => res.json({ ok: true, isVercel }));
 
 app.post("/api/proxy", async (req, res) => {
   try {
-    const { url, headers, body } = req.body;
+    const reqBody = typeof req.body === 'string' ? JSON.parse(req.body) : (req.body || {});
+    const { url, headers, body } = reqBody;
+    
+    if (!url) {
+      return res.status(400).json({ error: { message: "Invalid request: 'url' parameter is missing. Body was: " + JSON.stringify(reqBody).substring(0, 50) } });
+    }
     
     const response = await fetch(url, {
       method: 'POST',
-      headers: headers,
-      body: JSON.stringify(body)
+      headers: headers || {},
+      body: JSON.stringify(body || {})
     });
     
     if (!response.ok) {
@@ -55,9 +55,9 @@ app.post("/api/proxy", async (req, res) => {
     
     const data = await response.json();
     res.status(response.status).json(data);
-  } catch (error) {
+  } catch (error: any) {
     console.error("Proxy error:", error);
-    res.status(500).json({ error: { message: error instanceof Error ? `Proxy fetch failed: ${error.name} - ${error.message} (URL: ${req.body?.url || 'missing url'})` : "Proxy fetch failed" } });
+    res.status(500).json({ error: { message: `Proxy fetch failed: ${error.name} - ${error.message}` } });
   }
 });
 
