@@ -21,8 +21,16 @@ async function ensureDb() {
   }
 }
 
-// Use increased limit to allow potentially large inputs just in case
-app.use(express.json({ limit: '10mb' }));
+// Vercel Serverless Functions automatically parse the body.
+if (!isVercel) {
+  app.use(express.json({ limit: '10mb' }));
+} else {
+  // On Vercel, ensure req.body defaults to an object if undefined
+  app.use((req, res, next) => {
+    req.body = req.body || {};
+    next();
+  });
+}
 
 app.post("/api/proxy", async (req, res) => {
   try {
@@ -49,7 +57,7 @@ app.post("/api/proxy", async (req, res) => {
     res.status(response.status).json(data);
   } catch (error) {
     console.error("Proxy error:", error);
-    res.status(500).json({ error: { message: error instanceof Error ? error.message : "Proxy fetch failed" } });
+    res.status(500).json({ error: { message: error instanceof Error ? `Proxy fetch failed: ${error.name} - ${error.message} (URL: ${req.body?.url || 'missing url'})` : "Proxy fetch failed" } });
   }
 });
 
