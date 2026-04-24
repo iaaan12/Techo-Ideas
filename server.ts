@@ -4,19 +4,23 @@ import path from "path";
 import crypto from "crypto";
 import fs from "fs/promises";
 
-async function startServer() {
-  const app = express();
-  const PORT = 3000;
-  const DATA_FILE = path.join(process.cwd(), 'database.json');
+const app = express();
+const PORT = 3000;
+const isVercel = process.env.VERCEL === '1';
+const DATA_FILE = isVercel ? '/tmp/database.json' : path.join(process.cwd(), 'database.json');
 
-  // Ensure DB file exists
+// Ensure DB file exists
+try {
+  await fs.access(DATA_FILE);
+} catch (e) {
   try {
-    await fs.access(DATA_FILE);
-  } catch (e) {
     await fs.writeFile(DATA_FILE, JSON.stringify({ ideas: {} }));
+  } catch (err) {
+    console.warn("No default write access for DB, may be running in read-only mode:", err.message);
   }
+}
 
-  // Use increased limit to allow potentially large inputs just in case
+// Use increased limit to allow potentially large inputs just in case
   app.use(express.json({ limit: '10mb' }));
 
   app.post("/api/proxy", async (req, res) => {
@@ -126,16 +130,17 @@ async function startServer() {
     app.use(vite.middlewares);
   } else {
     // Production mode: serving index.html
-    const cwd = process.cwd();
-    app.use(express.static(cwd));
+    const distPath = path.join(process.cwd(), 'dist');
+    app.use(express.static(distPath));
     app.get('*', (req, res) => {
-      res.sendFile(path.join(cwd, 'index.html'));
+      res.sendFile(path.join(distPath, 'index.html'));
     });
   }
-
-  app.listen(PORT, "0.0.0.0", () => {
-    console.log(`Server running on http://localhost:${PORT}`);
-  });
-}
-
-startServer();
+  
+  if (!isVercel) {
+    app.listen(PORT, "0.0.0.0", () => {
+      console.log(`Server running on http://localhost:${PORT}`);
+    });
+  }
+  
+  export default app;
