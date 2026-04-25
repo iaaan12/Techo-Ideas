@@ -1,1397 +1,2025 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>TECHO Salta — Generador de Contenido</title>
-    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&family=Inter:wght@400;500;600;700&family=Permanent+Marker&display=swap" rel="stylesheet">
+    <link
+      href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&family=Inter:wght@400;500;600;700&family=Permanent+Marker&display=swap"
+      rel="stylesheet"
+    />
     <style>
-        :root {
-            /* TECHO Lab / Neo-Brutalist Colors */
-            --techo-blue: #0092DD;
-            --techo-blue-dark: #007bb5;
-            --techo-accent: #FFD100;
-            --techo-black: #111827;
-            
-            --bg-cream: #F0ECE3; /* Deep cream */
-            --bg-striped: #F4F4F5;
-            --text-dark: #111827;
-            --text-muted: #3f4851;
-            --white: #FFFFFF;
-            
-            --error: #ba1a1a;
-            --success: #16a34a;
-            --warning: #f59e0b;
-            
-            --color-post: #0092DD;
-            --color-carousel: #7C3AED;
-            --color-reel: #E53E3E;
-            --color-story: #f59e0b;
+      :root {
+        /* TECHO Lab / Neo-Brutalist Colors */
+        --techo-blue: #0092dd;
+        --techo-blue-dark: #007bb5;
+        --techo-accent: #ffd100;
+        --techo-black: #111827;
 
-            /* Fonts */
-            --font-headings: 'Fredoka', sans-serif;
-            --font-body: 'Inter', sans-serif;
-            --font-marker: 'Permanent Marker', cursive;
-            
-            /* Neo-Brutalist Values */
-            --border-radius: 8px; /* 0.5rem */
-            --border-thick: 3px solid var(--techo-black);
-            --shadow-brutal: 4px 4px 0px 0px rgba(17,24,39,1);
-            --shadow-brutal-hover: 2px 2px 0px 0px rgba(17,24,39,1);
-            --transition: 0.2s ease-out;
-        }
+        --bg-cream: #f0ece3; /* Deep cream */
+        --bg-striped: #f4f4f5;
+        --text-dark: #111827;
+        --text-muted: #3f4851;
+        --white: #ffffff;
 
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-        }
+        --error: #ba1a1a;
+        --success: #16a34a;
+        --warning: #f59e0b;
 
-        body {
-            font-family: var(--font-body);
-            background-color: var(--bg-cream);
-            background-image: radial-gradient(var(--techo-black) 1px, transparent 1px);
-            background-size: 20px 20px;
-            color: var(--text-dark);
-            line-height: 1.5;
-        }
+        --color-post: #0092dd;
+        --color-carousel: #7c3aed;
+        --color-reel: #e53e3e;
+        --color-story: #f59e0b;
 
-        h1, h2, h3, h4, h5, h6, .btn {
-            font-family: var(--font-headings);
-        }
+        /* Fonts */
+        --font-headings: "Fredoka", sans-serif;
+        --font-body: "Inter", sans-serif;
+        --font-marker: "Permanent Marker", cursive;
 
-        /* Layout */
-        .app-container {
-            display: flex;
-            flex-direction: column;
-            min-height: 100vh;
-        }
+        /* Neo-Brutalist Values */
+        --border-radius: 8px; /* 0.5rem */
+        --border-thick: 3px solid var(--techo-black);
+        --shadow-brutal: 4px 4px 0px 0px rgba(17, 24, 39, 1);
+        --shadow-brutal-hover: 2px 2px 0px 0px rgba(17, 24, 39, 1);
+        --transition: 0.2s ease-out;
+      }
 
-        .header {
-            height: 5rem;
-            padding: 0 2rem;
-            background: var(--white);
-            border-bottom: var(--border-thick);
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            z-index: 10;
-        }
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
 
-        .header h1 {
-            color: var(--text-dark);
-            font-size: 1.5rem;
-            font-weight: bold;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-        .header h1 span {
-            color: var(--techo-blue);
-            font-size: 0.75rem;
-            text-transform: uppercase;
-            letter-spacing: 0.025em;
-            font-weight: normal;
-        }
+      body {
+        font-family: var(--font-body);
+        background-color: var(--bg-cream);
+        background-image: radial-gradient(
+          var(--techo-black) 1px,
+          transparent 1px
+        );
+        background-size: 20px 20px;
+        color: var(--text-dark);
+        line-height: 1.5;
+      }
 
-        .header-actions {
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-        }
+      h1,
+      h2,
+      h3,
+      h4,
+      h5,
+      h6,
+      .btn {
+        font-family: var(--font-headings);
+      }
 
-        .api-badge {
-            font-size: 0.75rem;
-            font-weight: 600;
-            padding: 0.375rem 0.75rem;
-            border-radius: 9999px;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            text-transform: uppercase;
-            border: 1px solid transparent;
-        }
-        .api-badge.connected { background: #f0fdf4; color: #15803d; border-color: #bbf7d0; }
-        .api-badge.missing { background: #fffbeb; color: #b45309; border-color: #fde68a; }
+      /* Layout */
+      .app-container {
+        display: flex;
+        flex-direction: column;
+        min-height: 100vh;
+      }
 
-        .main-layout {
-            display: flex;
-            flex: 1;
-            width: 100%;
-        }
+      .header {
+        height: 5rem;
+        padding: 0 2rem;
+        background: var(--white);
+        border-bottom: var(--border-thick);
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        z-index: 10;
+      }
 
-        /* Theme Polish */
-        .sidebar {
-            width: 320px; /* slightly smaller to fit better */
-            background: var(--white);
-            border-right: var(--border-thick);
-            padding: 1.5rem;
-            display: flex;
-            flex-direction: column;
-            gap: 1.5rem; /* softer spacing */
-            z-index: 5;
-        }
+      .header h1 {
+        color: var(--text-dark);
+        font-size: 1.5rem;
+        font-weight: bold;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+      .header h1 span {
+        color: var(--techo-blue);
+        font-size: 0.75rem;
+        text-transform: uppercase;
+        letter-spacing: 0.025em;
+        font-weight: normal;
+      }
 
-        .content-area {
-            flex: 1;
-            padding: 2rem;
-            display: flex;
-            flex-direction: column;
-            gap: 1.5rem;
-            background: repeating-linear-gradient(45deg, var(--bg-cream), var(--bg-cream) 10px, rgba(17,24,39,0.02) 10px, rgba(17,24,39,0.02) 20px);
-        }
+      .header-actions {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+      }
 
+      .api-badge {
+        font-size: 0.75rem;
+        font-weight: 600;
+        padding: 0.375rem 0.75rem;
+        border-radius: 9999px;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        text-transform: uppercase;
+        border: 1px solid transparent;
+      }
+      .api-badge.connected {
+        background: #f0fdf4;
+        color: #15803d;
+        border-color: #bbf7d0;
+      }
+      .api-badge.missing {
+        background: #fffbeb;
+        color: #b45309;
+        border-color: #fde68a;
+      }
+
+      .main-layout {
+        display: flex;
+        flex: 1;
+        width: 100%;
+      }
+
+      /* Theme Polish */
+      .sidebar {
+        width: 320px; /* slightly smaller to fit better */
+        background: var(--white);
+        border-right: var(--border-thick);
+        padding: 1.5rem;
+        display: flex;
+        flex-direction: column;
+        gap: 1.5rem; /* softer spacing */
+        z-index: 5;
+      }
+
+      .content-area {
+        flex: 1;
+        padding: 2rem;
+        display: flex;
+        flex-direction: column;
+        gap: 1.5rem;
+        background: repeating-linear-gradient(
+          45deg,
+          var(--bg-cream),
+          var(--bg-cream) 10px,
+          rgba(17, 24, 39, 0.02) 10px,
+          rgba(17, 24, 39, 0.02) 20px
+        );
+      }
+
+      #resultadosContainer {
+        display: flex;
+        flex-direction: column;
+        gap: 1.5rem;
+      }
+
+      @media (min-width: 1024px) {
         #resultadosContainer {
-            display: flex;
-            flex-direction: column;
-            gap: 1.5rem;
-        }
-        
-        @media (min-width: 1024px) {
-            #resultadosContainer {
-                display: block;
-                column-count: 2;
-                column-gap: 1.5rem;
-            }
-            
-            #resultadosContainer > h2, 
-            #resultadosContainer > div.card {
-                column-span: all;
-                margin-bottom: 1.5rem;
-            }
-            
-            #resultadosContainer > .idea-card {
-                display: inline-flex;
-                width: 100%;
-                break-inside: avoid-column;
-                page-break-inside: avoid;
-                margin-bottom: 1.5rem;
-            }
+          display: block;
+          column-count: 2;
+          column-gap: 1.5rem;
         }
 
-        /* Components */
-        .card {
-            background: var(--white);
-            border-radius: var(--border-radius);
-            padding: 1.25rem;
-            box-shadow: var(--shadow-brutal);
-            border: var(--border-thick);
+        #resultadosContainer > h2,
+        #resultadosContainer > div.card {
+          column-span: all;
+          margin-bottom: 1.5rem;
         }
 
-        /* Forms */
-        .form-group {
-            margin-bottom: 1rem;
-            display: flex;
-            flex-direction: column;
-            gap: 0.5rem;
+        #resultadosContainer > .idea-card {
+          display: inline-flex;
+          width: 100%;
+          break-inside: avoid-column;
+          page-break-inside: avoid;
+          margin-bottom: 1.5rem;
         }
+      }
 
-        .form-label {
-            display: block;
-            font-size: 0.6875rem; /* 11px */
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 0.1em;
-            color: var(--techo-blue);
-            margin-bottom: 0;
-        }
+      /* Components */
+      .card {
+        background: var(--white);
+        border-radius: var(--border-radius);
+        padding: 1.25rem;
+        box-shadow: var(--shadow-brutal);
+        border: var(--border-thick);
+      }
 
-        .form-control {
-            width: 100%;
-            padding: 0.75rem;
-            font-size: 0.875rem;
-            background: var(--bg-cream);
-            border: var(--border-thick);
-            border-radius: 0; /* Brutalist inputs are often sharp, but shape says 8px */
-            border-radius: var(--border-radius);
-            font-family: var(--font-body);
-            transition: all var(--transition);
-            outline: none;
-            box-shadow: 2px 2px 0px 0px transparent;
-        }
-        .form-control:focus {
-            background: var(--white);
-            border-color: var(--techo-blue);
-            box-shadow: var(--shadow-brutal-hover);
-        }
+      /* Forms */
+      .form-group {
+        margin-bottom: 1rem;
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+      }
 
-        textarea.form-control {
-            resize: none;
-            height: 6rem;
-        }
+      .form-label {
+        display: block;
+        font-size: 0.6875rem; /* 11px */
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.1em;
+        color: var(--techo-blue);
+        margin-bottom: 0;
+      }
 
-        .btn {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-            font-family: var(--font-headings);
-            cursor: pointer;
-            transition: all var(--transition);
-            border: none;
-        }
-        
-        .btn-primary {
-            width: 100%;
-            padding: 1rem;
-            background: var(--techo-black);
-            color: var(--white);
-            border-radius: var(--border-radius);
-            font-weight: 700;
-            font-size: 1.125rem;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-            box-shadow: var(--shadow-brutal);
-            border: var(--border-thick);
-        }
-        .btn-primary:hover:not(:disabled) {
-            transform: translate(2px, 2px);
-            background: #2c3136;
-            box-shadow: var(--shadow-brutal-hover);
-        }
-        .btn-primary:disabled {
-            background: #9ca3af;
-            box-shadow: none;
-            cursor: not-allowed;
-            transform: none;
-            border-color: #6b7280;
-        }
+      .form-control {
+        width: 100%;
+        padding: 0.75rem;
+        font-size: 0.875rem;
+        background: var(--bg-cream);
+        border: var(--border-thick);
+        border-radius: 0; /* Brutalist inputs are often sharp, but shape says 8px */
+        border-radius: var(--border-radius);
+        font-family: var(--font-body);
+        transition: all var(--transition);
+        outline: none;
+        box-shadow: 2px 2px 0px 0px transparent;
+      }
+      .form-control:focus {
+        background: var(--white);
+        border-color: var(--techo-blue);
+        box-shadow: var(--shadow-brutal-hover);
+      }
 
-        .btn-outline {
-            padding: 0.5rem 1rem;
-            background: var(--white);
-            border: var(--border-thick);
-            color: var(--text-dark);
-            border-radius: var(--border-radius);
-            font-size: 0.875rem;
-            font-weight: 700;
-            box-shadow: var(--shadow-brutal-hover);
-            transition: transform var(--transition), box-shadow var(--transition);
-        }
-        .btn-outline:hover {
-            background: var(--bg-cream);
-            transform: translate(2px, 2px);
-            box-shadow: 0px 0px 0px 0px transparent;
-        }
-        
-        .btn-small { padding: 0.25rem 0.5rem; font-size: 0.75rem; border-radius: 0.25rem; }
+      textarea.form-control {
+        resize: none;
+        height: 6rem;
+      }
 
-        /* Custom Checkbox/Radio */
-        .checkbox-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 0.5rem;
-            font-size: 0.625rem; /* 10px */
-        }
-        .check-label {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            padding: 0.5rem;
-            background: var(--white);
-            border: 1px solid #e5e7eb;
-            border-radius: 0.5rem;
-            cursor: pointer;
-            font-weight: 700;
-            text-transform: uppercase;
-            opacity: 0.6;
-        }
-        .check-label:has(input:checked) {
-            background: rgba(0, 146, 221, 0.05);
-            border-color: rgba(0, 146, 221, 0.2);
-            opacity: 1;
-            color: var(--text-dark);
-        }
-        
-        /* Modes & Tabs */
-        .mode-selector {
-            display: flex;
-            background: var(--bg-cream);
-            padding: 0.25rem;
-            border-radius: 0.5rem;
-            margin-bottom: 1.25rem;
-            border: 1px solid rgba(13, 27, 42, 0.05);
-        }
-        .mode-btn {
-            flex: 1;
-            padding: 0.375rem;
-            text-align: center;
-            border-radius: 0.375rem;
-            cursor: pointer;
-            font-size: 0.875rem;
-            font-weight: 700;
-            color: var(--text-muted);
-            transition: var(--transition);
-        }
-        .mode-btn.active {
-            background: var(--white);
-            box-shadow: 0 1px 2px 0 rgba(0,0,0,0.05);
-            color: var(--text-dark);
-        }
+      .btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        font-family: var(--font-headings);
+        cursor: pointer;
+        transition: all var(--transition);
+        border: none;
+      }
 
-        .tabs {
-            display: flex;
-            gap: 0.75rem;
-            flex-wrap: wrap;
-            border-bottom: 1px solid rgba(13, 27, 42, 0.1);
-            padding-bottom: 0.25rem;
-            margin-bottom: 1.25rem;
-        }
-        .tab-btn {
-            font-size: 0.8rem;
-            font-weight: 700;
-            background: none;
-            border: none;
-            padding: 0 0.25rem 0.5rem 0.25rem;
-            color: var(--text-muted);
-            cursor: pointer;
-            border-bottom: 2px solid transparent;
-            margin-bottom: -0.25rem;
-            text-transform: uppercase;
-        }
-        .tab-btn.active {
-            color: var(--text-dark);
-            border-bottom-color: var(--techo-blue);
-        }
+      .btn-primary {
+        width: 100%;
+        padding: 1rem;
+        background: var(--techo-black);
+        color: var(--white);
+        border-radius: var(--border-radius);
+        font-weight: 700;
+        font-size: 1.125rem;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        box-shadow: var(--shadow-brutal);
+        border: var(--border-thick);
+      }
+      .btn-primary:hover:not(:disabled) {
+        transform: translate(2px, 2px);
+        background: #2c3136;
+        box-shadow: var(--shadow-brutal-hover);
+      }
+      .btn-primary:disabled {
+        background: #9ca3af;
+        box-shadow: none;
+        cursor: not-allowed;
+        transform: none;
+        border-color: #6b7280;
+      }
 
-        .tab-content { display: none; }
-        .tab-content.active { display: block; flex: 1; min-height: 0; }
+      .btn-outline {
+        padding: 0.5rem 1rem;
+        background: var(--white);
+        border: var(--border-thick);
+        color: var(--text-dark);
+        border-radius: var(--border-radius);
+        font-size: 0.875rem;
+        font-weight: 700;
+        box-shadow: var(--shadow-brutal-hover);
+        transition:
+          transform var(--transition),
+          box-shadow var(--transition);
+      }
+      .btn-outline:hover {
+        background: var(--bg-cream);
+        transform: translate(2px, 2px);
+        box-shadow: 0px 0px 0px 0px transparent;
+      }
 
-        /* Modal */
-        .modal-overlay {
-            position: fixed;
-            top: 0; left: 0; right: 0; bottom: 0;
-            background: rgba(13, 27, 42, 0.5);
-            backdrop-filter: blur(4px);
-            display: none;
-            justify-content: center;
-            align-items: center;
-            z-index: 1000;
-            padding: 1rem;
-        }
-        .modal-overlay.active { display: flex; }
-        .modal-content {
-            background: var(--white);
-            border-radius: var(--border-radius);
-            width: 100%;
-            max-width: 800px;
-            max-height: 90vh;
-            display: flex;
-            flex-direction: column;
-            overflow: hidden;
-            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
-            border: 1px solid rgba(0,0,0,0.05);
-        }
-        .modal-header {
-            padding: 1.5rem;
-            border-bottom: 1px solid rgba(13, 27, 42, 0.1);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            background: rgba(240, 236, 227, 0.2);
-        }
-        .modal-body {
-            padding: 1.5rem;
-            overflow-y: auto;
-            flex: 1;
-        }
-        .modal-footer {
-            padding: 1.5rem;
-            border-top: 1px solid rgba(13, 27, 42, 0.1);
-            display: flex;
-            justify-content: flex-end;
-            gap: 1rem;
-            background: rgba(240, 236, 227, 0.2);
-        }
-        .close-btn {
-            background: none;
-            border: none;
-            font-size: 1.5rem;
-            cursor: pointer;
-            color: var(--text-muted);
-            transition: color var(--transition);
-        }
-        .close-btn:hover { color: var(--text-dark); }
+      .btn-small {
+        padding: 0.25rem 0.5rem;
+        font-size: 0.75rem;
+        border-radius: 0.25rem;
+      }
 
-        /* Tag Input */
-        .tag-container {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 8px;
-            padding: 0.5rem;
-            background: rgba(240, 236, 227, 0.5);
-            border: 1px solid transparent;
-            border-radius: 0.75rem;
-            min-height: 44px;
-        }
-        .tag {
-            background: var(--white);
-            padding: 4px 10px;
-            border-radius: var(--border-radius);
-            font-size: 0.75rem;
-            font-weight: 600;
-            display: flex;
-            align-items: center;
-            gap: 5px;
-            box-shadow: 2px 2px 0px 0px var(--techo-black);
-            border: var(--border-thick);
-        }
-        .tag-close {
-            cursor: pointer;
-            color: var(--text-muted);
-            font-weight: bold;
-        }
-        .tag-input-field {
-            border: none;
-            outline: none;
-            flex: 1;
-            min-width: 100px;
-            font-family: var(--font-body);
-            background: transparent;
-            font-size: 0.875rem;
-        }
+      /* Custom Checkbox/Radio */
+      .checkbox-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 0.5rem;
+        font-size: 0.625rem; /* 10px */
+      }
+      .check-label {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.5rem;
+        background: var(--white);
+        border: 1px solid #e5e7eb;
+        border-radius: 0.5rem;
+        cursor: pointer;
+        font-weight: 700;
+        text-transform: uppercase;
+        opacity: 0.6;
+      }
+      .check-label:has(input:checked) {
+        background: rgba(0, 146, 221, 0.05);
+        border-color: rgba(0, 146, 221, 0.2);
+        opacity: 1;
+        color: var(--text-dark);
+      }
 
-        /* Idea Card */
-        p {
-            word-break: break-word;
-            overflow-wrap: break-word;
+      /* Modes & Tabs */
+      .mode-selector {
+        display: flex;
+        background: var(--bg-cream);
+        padding: 0.25rem;
+        border-radius: 0.5rem;
+        margin-bottom: 1.25rem;
+        border: 1px solid rgba(13, 27, 42, 0.05);
+      }
+      .mode-btn {
+        flex: 1;
+        padding: 0.375rem;
+        text-align: center;
+        border-radius: 0.375rem;
+        cursor: pointer;
+        font-size: 0.875rem;
+        font-weight: 700;
+        color: var(--text-muted);
+        transition: var(--transition);
+      }
+      .mode-btn.active {
+        background: var(--white);
+        box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+        color: var(--text-dark);
+      }
+
+      .tabs {
+        display: flex;
+        gap: 0.75rem;
+        flex-wrap: wrap;
+        border-bottom: 1px solid rgba(13, 27, 42, 0.1);
+        padding-bottom: 0.25rem;
+        margin-bottom: 1.25rem;
+      }
+      .tab-btn {
+        font-size: 0.8rem;
+        font-weight: 700;
+        background: none;
+        border: none;
+        padding: 0 0.25rem 0.5rem 0.25rem;
+        color: var(--text-muted);
+        cursor: pointer;
+        border-bottom: 2px solid transparent;
+        margin-bottom: -0.25rem;
+        text-transform: uppercase;
+      }
+      .tab-btn.active {
+        color: var(--text-dark);
+        border-bottom-color: var(--techo-blue);
+      }
+
+      .tab-content {
+        display: none;
+      }
+      .tab-content.active {
+        display: block;
+        flex: 1;
+        min-height: 0;
+      }
+
+      /* Modal */
+      .modal-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(13, 27, 42, 0.5);
+        backdrop-filter: blur(4px);
+        display: none;
+        justify-content: center;
+        align-items: center;
+        z-index: 1000;
+        padding: 1rem;
+      }
+      .modal-overlay.active {
+        display: flex;
+      }
+      .modal-content {
+        background: var(--white);
+        border-radius: var(--border-radius);
+        width: 100%;
+        max-width: 800px;
+        max-height: 90vh;
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+        box-shadow:
+          0 20px 25px -5px rgba(0, 0, 0, 0.1),
+          0 10px 10px -5px rgba(0, 0, 0, 0.04);
+        border: 1px solid rgba(0, 0, 0, 0.05);
+      }
+      .modal-header {
+        padding: 1.5rem;
+        border-bottom: 1px solid rgba(13, 27, 42, 0.1);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        background: rgba(240, 236, 227, 0.2);
+      }
+      .modal-body {
+        padding: 1.5rem;
+        overflow-y: auto;
+        flex: 1;
+      }
+      .modal-footer {
+        padding: 1.5rem;
+        border-top: 1px solid rgba(13, 27, 42, 0.1);
+        display: flex;
+        justify-content: flex-end;
+        gap: 1rem;
+        background: rgba(240, 236, 227, 0.2);
+      }
+      .close-btn {
+        background: none;
+        border: none;
+        font-size: 1.5rem;
+        cursor: pointer;
+        color: var(--text-muted);
+        transition: color var(--transition);
+      }
+      .close-btn:hover {
+        color: var(--text-dark);
+      }
+
+      /* Tag Input */
+      .tag-container {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        padding: 0.5rem;
+        background: rgba(240, 236, 227, 0.5);
+        border: 1px solid transparent;
+        border-radius: 0.75rem;
+        min-height: 44px;
+      }
+      .tag {
+        background: var(--white);
+        padding: 4px 10px;
+        border-radius: var(--border-radius);
+        font-size: 0.75rem;
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+        gap: 5px;
+        box-shadow: 2px 2px 0px 0px var(--techo-black);
+        border: var(--border-thick);
+      }
+      .tag-close {
+        cursor: pointer;
+        color: var(--text-muted);
+        font-weight: bold;
+      }
+      .tag-input-field {
+        border: none;
+        outline: none;
+        flex: 1;
+        min-width: 100px;
+        font-family: var(--font-body);
+        background: transparent;
+        font-size: 0.875rem;
+      }
+
+      /* Idea Card */
+      p {
+        word-break: break-word;
+        overflow-wrap: break-word;
+      }
+
+      .idea-card {
+        background: var(--white);
+        border-radius: var(--border-radius);
+        overflow: hidden;
+        box-shadow: var(--shadow-brutal);
+        border: var(--border-thick);
+        display: flex;
+        flex-direction: column;
+        margin-bottom: 0;
+        transition: transform var(--transition);
+      }
+      .idea-card:hover {
+        transform: translate(-1px, -1px);
+      }
+
+      .idea-header {
+        padding: 1rem;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        cursor: pointer;
+        color: var(--white);
+        font-size: 0.75rem; /* 12px */
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        border-bottom: var(--border-thick);
+      }
+      .idea-header[data-type="post estático"],
+      .idea-header[data-type="post"] {
+        background: var(--color-post);
+      }
+      .idea-header[data-type="carrusel"] {
+        background: var(--color-carousel);
+      }
+      .idea-header[data-type="reel"] {
+        background: var(--color-reel);
+      }
+      .idea-header[data-type="story"] {
+        background: var(--color-story);
+      }
+
+      .idea-body {
+        padding: 1.25rem;
+        display: none;
+        flex-direction: column;
+        gap: 0.75rem;
+      }
+      .idea-card.expanded .idea-body {
+        display: flex;
+      }
+      .idea-card.expanded .toggle-icon {
+        transform: rotate(180deg);
+      }
+
+      .idea-section {
+        margin-bottom: 0;
+        border-top: 1px solid rgba(13, 27, 42, 0.05);
+        padding-top: 0.75rem;
+      }
+      .idea-body > .badge {
+        margin-bottom: 0 !important;
+        align-self: flex-start;
+      }
+      .idea-section:first-of-type {
+        border-top: none;
+        padding-top: 0;
+      }
+
+      .idea-section-title {
+        font-weight: 700;
+        font-size: 1.125rem;
+        font-style: italic;
+        line-height: 1.2;
+        color: var(--text-dark);
+        margin-bottom: 0.5rem;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+      }
+
+      .idea-section p {
+        font-size: 0.875rem;
+        color: var(--text-muted);
+        line-height: 1.375;
+      }
+
+      .idea-copy {
+        background: transparent;
+        font-size: 0.875rem;
+        color: var(--text-muted);
+        line-height: 1.375;
+        white-space: pre-wrap;
+        margin-bottom: 0;
+        padding: 0;
+        border-radius: 0;
+        word-break: break-word;
+        overflow-wrap: break-word;
+      }
+
+      /* History Item */
+      .history-item {
+        background: var(--white);
+        border: var(--border-thick);
+        border-radius: var(--border-radius);
+        padding: 1rem;
+        margin-bottom: 0.75rem;
+        box-shadow: var(--shadow-brutal-hover);
+        transition: transform var(--transition);
+      }
+      .history-item:hover {
+        transform: translate(-2px, -2px);
+        box-shadow: var(--shadow-brutal);
+      }
+      .history-meta {
+        display: flex;
+        justify-content: space-between;
+        font-size: 0.75rem;
+        font-weight: 600;
+        color: var(--text-muted);
+        margin-bottom: 0.25rem;
+        text-transform: uppercase;
+      }
+
+      .badge {
+        padding: 4px 8px;
+        border-radius: 4px;
+        font-size: 0.625rem; /* 10px */
+        font-weight: 700;
+        color: white;
+        text-transform: uppercase;
+        border: 2px solid var(--techo-black);
+        box-shadow: 2px 2px 0px 0px rgba(0, 0, 0, 1);
+      }
+      .badge-post {
+        background: var(--color-post);
+      }
+      .badge-carousel {
+        background: var(--color-carousel);
+      }
+      .badge-reel {
+        background: var(--color-reel);
+      }
+      .badge-story {
+        background: var(--color-story);
+      }
+
+      .loader {
+        display: none;
+        border: 3px solid rgba(255, 255, 255, 0.3);
+        border-top: 3px solid var(--white);
+        border-radius: 50%;
+        width: 20px;
+        height: 20px;
+        animation: spin 1s linear infinite;
+      }
+      @keyframes spin {
+        0% {
+          transform: rotate(0deg);
         }
-        
-        .idea-card {
-            background: var(--white);
-            border-radius: var(--border-radius);
-            overflow: hidden;
-            box-shadow: var(--shadow-brutal);
-            border: var(--border-thick);
-            display: flex;
-            flex-direction: column;
-            margin-bottom: 0;
-            transition: transform var(--transition);
+        100% {
+          transform: rotate(360deg);
         }
-        .idea-card:hover {
-            transform: translate(-1px, -1px);
+      }
+
+      .animate-spin {
+        animation: spin 1s linear infinite;
+      }
+
+      /* Social Mockup Preview */
+      .mockup-container {
+        width: 320px;
+        background: var(--white);
+        border-radius: 24px;
+        border: var(--border-thick);
+        box-shadow: 8px 8px 0px 0px rgba(0, 0, 0, 1);
+        overflow: hidden;
+        margin: 0 auto;
+        position: relative;
+      }
+
+      .mockup-header {
+        display: flex;
+        align-items: center;
+        padding: 12px 16px;
+        border-bottom: 1px solid #efefef;
+      }
+
+      .mockup-profile {
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        background: var(--techo-blue);
+        margin-right: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 12px;
+        font-weight: bold;
+      }
+
+      .mockup-username {
+        font-weight: 600;
+        font-size: 0.85rem;
+        color: var(--techo-black);
+      }
+
+      .mockup-media {
+        width: 100%;
+        aspect-ratio: 4/5;
+        background: var(--background);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 20px;
+        text-align: center;
+        font-size: 0.85rem;
+        color: var(--text-muted);
+        border-bottom: 1px solid #efefef;
+      }
+
+      .mockup-actions-bar {
+        padding: 12px 16px 8px;
+        display: flex;
+        gap: 12px;
+      }
+
+      .mockup-caption {
+        padding: 0 16px 16px;
+        font-size: 0.85rem;
+        line-height: 1.4;
+        max-height: 200px;
+        overflow-y: auto;
+        white-space: pre-wrap; /* to preserve newlines */
+        word-break: break-word;
+      }
+
+      .mockup-caption strong {
+        font-weight: 600;
+      }
+
+      .anim-slide-up {
+        animation: slideUp 0.3s ease-out forwards;
+      }
+      @keyframes slideUp {
+        from {
+          transform: translateY(20px);
+          opacity: 0;
         }
-        
-        .idea-header {
-            padding: 1rem;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            cursor: pointer;
-            color: var(--white);
-            font-size: 0.75rem; /* 12px */
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-            border-bottom: var(--border-thick);
+        to {
+          transform: translateY(0);
+          opacity: 1;
         }
-        .idea-header[data-type="post estático"], .idea-header[data-type="post"] { background: var(--color-post); }
-        .idea-header[data-type="carrusel"] { background: var(--color-carousel); }
-        .idea-header[data-type="reel"] { background: var(--color-reel); }
-        .idea-header[data-type="story"] { background: var(--color-story); }
-        
+      }
+
+      [data-theme="dark"] {
+        --bg-cream: #18181b;
+        --bg-striped: #27272a;
+        --text-dark: #f4f4f5;
+        --text-muted: #a1a1aa;
+        --white: #27272a;
+        --techo-black: #09090b;
+        --shadow-brutal: 4px 4px 0px 0px rgba(0, 0, 0, 1);
+        --shadow-brutal-hover: 2px 2px 0px 0px rgba(0, 0, 0, 1);
+        --border-thick: 3px solid var(--techo-black);
+      }
+
+      [data-theme="dark"] body {
+        background-image: radial-gradient(#3f3f46 1px, transparent 1px);
+      }
+
+      [data-theme="dark"] input,
+      [data-theme="dark"] select,
+      [data-theme="dark"] textarea {
+        background: var(--bg-cream);
+        color: var(--text-dark);
+      }
+
+      [data-theme="dark"] .badge-content {
+        background: #3f3f46;
+        color: #fff;
+      }
+
+      /* Thematic Loading Loader */
+      .thematic-loader {
+        display: none;
+        justify-content: center;
+        align-items: center;
+        flex-direction: column;
+        padding: 2rem;
+        background: var(--white);
+        border: var(--border-thick);
+        border-radius: var(--border-radius);
+        box-shadow: var(--shadow-brutal);
+        margin-bottom: 2rem;
+        text-align: center;
+      }
+
+      .thematic-loader.active {
+        display: flex;
+      }
+
+      .house-builder {
+        position: relative;
+        width: 80px;
+        height: 80px;
+        margin-bottom: 1rem;
+      }
+
+      .brick {
+        background-color: var(--techo-blue);
+        border: 2px solid var(--techo-black);
+        position: absolute;
+        opacity: 0;
+        animation: build-house 2.5s infinite;
+      }
+
+      .brick-1 {
+        width: 40px;
+        height: 16px;
+        bottom: 0;
+        left: 20px;
+        animation-delay: 0s;
+      }
+      .brick-2 {
+        width: 24px;
+        height: 16px;
+        bottom: 16px;
+        left: 10px;
+        animation-delay: 0.3s;
+      }
+      .brick-3 {
+        width: 24px;
+        height: 16px;
+        bottom: 16px;
+        right: 10px;
+        animation-delay: 0.6s;
+      }
+      .brick-4 {
+        width: 50px;
+        height: 16px;
+        bottom: 32px;
+        left: 15px;
+        animation-delay: 0.9s;
+      }
+
+      .roof {
+        width: 0;
+        height: 0;
+        border-left: 36px solid transparent;
+        border-right: 36px solid transparent;
+        border-bottom: 30px solid var(--techo-accent);
+        position: absolute;
+        bottom: 48px;
+        left: 4px;
+        opacity: 0;
+        animation: build-roof 2.5s infinite;
+        animation-delay: 1.2s;
+        filter: drop-shadow(0px -2px 0px var(--techo-black))
+          drop-shadow(2px 2px 0px var(--techo-black))
+          drop-shadow(-2px 2px 0px var(--techo-black));
+      }
+
+      @keyframes build-house {
+        0%,
+        15% {
+          opacity: 0;
+          transform: translateY(-10px);
+        }
+        20%,
+        80% {
+          opacity: 1;
+          transform: translateY(0);
+        }
+        100% {
+          opacity: 0;
+        }
+      }
+
+      @keyframes build-roof {
+        0%,
+        30% {
+          opacity: 0;
+          transform: translateY(-20px);
+        }
+        40%,
+        80% {
+          opacity: 1;
+          transform: translateY(0);
+        }
+        100% {
+          opacity: 0;
+        }
+      }
+
+      /* Responsive */
+      @media (max-width: 800px) {
+        html,
+        body {
+          height: auto;
+          min-height: 100vh;
+          overflow-y: auto;
+          overflow-x: hidden;
+        }
+        .app-container {
+          height: auto;
+          min-height: 100vh;
+          overflow: visible;
+          display: block;
+        }
+        .header {
+          padding: 1rem;
+          flex-wrap: wrap;
+          gap: 1rem;
+          height: auto;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+        }
+        .header h1 {
+          font-size: 1.2rem;
+        }
+        .header-actions {
+          width: 100%;
+          justify-content: center;
+        }
+        .main-layout {
+          flex-direction: column;
+          overflow: visible;
+          display: block;
+        }
+        .sidebar {
+          width: 100%;
+          border-right: none;
+          overflow: visible;
+          padding: 1rem;
+        }
+        .content-area {
+          overflow: visible;
+          padding: 1rem;
+        }
+        .resultados-container {
+          padding: 1rem;
+        }
+        .form-grid {
+          grid-template-columns: 1fr;
+        }
         .idea-body {
-            padding: 1.25rem;
-            display: none;
-            flex-direction: column;
-            gap: 0.75rem;
+          padding: 1rem;
         }
-        .idea-card.expanded .idea-body { display: flex; }
-        .idea-card.expanded .toggle-icon { transform: rotate(180deg); }
-        
-        .idea-section { 
-            margin-bottom: 0;
-            border-top: 1px solid rgba(13, 27, 42, 0.05);
-            padding-top: 0.75rem;
-        }
-        .idea-body > .badge {
-            margin-bottom: 0 !important;
-            align-self: flex-start;
-        }
-        .idea-section:first-of-type {
-           border-top: none; 
-           padding-top: 0;
-        }
-
-        .idea-section-title {
-            font-weight: 700;
-            font-size: 1.125rem;
-            font-style: italic;
-            line-height: 1.2;
-            color: var(--text-dark);
-            margin-bottom: 0.5rem;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-        }
-        
-        .idea-section p {
-            font-size: 0.875rem;
-            color: var(--text-muted);
-            line-height: 1.375;
-        }
-
-        .idea-copy {
-            background: transparent;
-            font-size: 0.875rem;
-            color: var(--text-muted);
-            line-height: 1.375;
-            white-space: pre-wrap;
-            margin-bottom: 0;
-            padding: 0;
-            border-radius: 0;
-            word-break: break-word;
-            overflow-wrap: break-word;
-        }
-        
-        /* History Item */
-        .history-item {
-            background: var(--white);
-            border: var(--border-thick);
-            border-radius: var(--border-radius);
-            padding: 1rem;
-            margin-bottom: 0.75rem;
-            box-shadow: var(--shadow-brutal-hover);
-            transition: transform var(--transition);
-        }
-        .history-item:hover {
-            transform: translate(-2px, -2px);
-            box-shadow: var(--shadow-brutal);
-        }
-        .history-meta {
-            display: flex;
-            justify-content: space-between;
-            font-size: 0.75rem;
-            font-weight: 600;
-            color: var(--text-muted);
-            margin-bottom: 0.25rem;
-            text-transform: uppercase;
-        }
-        
-        .badge {
-            padding: 4px 8px;
-            border-radius: 4px;
-            font-size: 0.625rem; /* 10px */
-            font-weight: 700;
-            color: white;
-            text-transform: uppercase;
-            border: 2px solid var(--techo-black);
-            box-shadow: 2px 2px 0px 0px rgba(0,0,0,1);
-        }
-        .badge-post { background: var(--color-post); }
-        .badge-carousel { background: var(--color-carousel); }
-        .badge-reel { background: var(--color-reel); }
-        .badge-story { background: var(--color-story); }
-
-        .loader {
-            display: none;
-            border: 3px solid rgba(255,255,255,0.3);
-            border-top: 3px solid var(--white);
-            border-radius: 50%;
-            width: 20px;
-            height: 20px;
-            animation: spin 1s linear infinite;
-        }
-        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-
-        .animate-spin {
-            animation: spin 1s linear infinite;
-        }
-
-        /* Social Mockup Preview */
         .mockup-container {
-            width: 320px;
-            background: var(--white);
-            border-radius: 24px;
-            border: var(--border-thick);
-            box-shadow: 8px 8px 0px 0px rgba(0,0,0,1);
-            overflow: hidden;
-            margin: 0 auto;
-            position: relative;
+          width: 100%;
+          max-width: 320px;
         }
-
-        .mockup-header {
-            display: flex;
-            align-items: center;
-            padding: 12px 16px;
-            border-bottom: 1px solid #efefef;
-        }
-
-        .mockup-profile {
-            width: 32px;
-            height: 32px;
-            border-radius: 50%;
-            background: var(--techo-blue);
-            margin-right: 10px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-size: 12px;
-            font-weight: bold;
-        }
-
-        .mockup-username {
-            font-weight: 600;
-            font-size: 0.85rem;
-            color: var(--techo-black);
-        }
-
-        .mockup-media {
-            width: 100%;
-            aspect-ratio: 4/5;
-            background: var(--background);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 20px;
-            text-align: center;
-            font-size: 0.85rem;
-            color: var(--text-muted);
-            border-bottom: 1px solid #efefef;
-        }
-
-        .mockup-actions-bar {
-            padding: 12px 16px 8px;
-            display: flex;
-            gap: 12px;
-        }
-
-        .mockup-caption {
-            padding: 0 16px 16px;
-            font-size: 0.85rem;
-            line-height: 1.4;
-            max-height: 200px;
-            overflow-y: auto;
-            white-space: pre-wrap; /* to preserve newlines */
-        }
-        
-        .mockup-caption strong {
-            font-weight: 600;
-        }
-
-        .anim-slide-up {
-            animation: slideUp 0.3s ease-out forwards;
-        }
-        @keyframes slideUp {
-            from { transform: translateY(20px); opacity: 0; }
-            to { transform: translateY(0); opacity: 1; }
-        }
-
-        [data-theme="dark"] {
-            --bg-cream: #18181b; 
-            --bg-striped: #27272a;
-            --text-dark: #f4f4f5;
-            --text-muted: #a1a1aa;
-            --white: #27272a;
-            --techo-black: #09090b;
-            --shadow-brutal: 4px 4px 0px 0px rgba(0,0,0,1);
-            --shadow-brutal-hover: 2px 2px 0px 0px rgba(0,0,0,1);
-            --border-thick: 3px solid var(--techo-black);
-        }
-        
-        [data-theme="dark"] body {
-            background-image: radial-gradient(#3f3f46 1px, transparent 1px);
-        }
-
-        [data-theme="dark"] input, 
-        [data-theme="dark"] select, 
-        [data-theme="dark"] textarea {
-            background: var(--bg-cream);
-            color: var(--text-dark);
-        }
-
-        [data-theme="dark"] .badge-content { background: #3f3f46; color: #fff; }
-        
-        /* Thematic Loading Loader */
-        .thematic-loader {
-            display: none;
-            justify-content: center;
-            align-items: center;
-            flex-direction: column;
-            padding: 2rem;
-            background: var(--white);
-            border: var(--border-thick);
-            border-radius: var(--border-radius);
-            box-shadow: var(--shadow-brutal);
-            margin-bottom: 2rem;
-            text-align: center;
-        }
-
-        .thematic-loader.active {
-            display: flex;
-        }
-
-        .house-builder {
-            position: relative;
-            width: 80px;
-            height: 80px;
-            margin-bottom: 1rem;
-        }
-
-        .brick {
-            background-color: var(--techo-blue);
-            border: 2px solid var(--techo-black);
-            position: absolute;
-            opacity: 0;
-            animation: build-house 2.5s infinite;
-        }
-
-        .brick-1 { width: 40px; height: 16px; bottom: 0; left: 20px; animation-delay: 0s; }
-        .brick-2 { width: 24px; height: 16px; bottom: 16px; left: 10px; animation-delay: 0.3s; }
-        .brick-3 { width: 24px; height: 16px; bottom: 16px; right: 10px; animation-delay: 0.6s; }
-        .brick-4 { width: 50px; height: 16px; bottom: 32px; left: 15px; animation-delay: 0.9s; }
-        
-        .roof {
-            width: 0;
-            height: 0;
-            border-left: 36px solid transparent;
-            border-right: 36px solid transparent;
-            border-bottom: 30px solid var(--techo-accent);
-            position: absolute;
-            bottom: 48px;
-            left: 4px;
-            opacity: 0;
-            animation: build-roof 2.5s infinite;
-            animation-delay: 1.2s;
-            filter: drop-shadow(0px -2px 0px var(--techo-black)) drop-shadow(2px 2px 0px var(--techo-black)) drop-shadow(-2px 2px 0px var(--techo-black));
-        }
-
-        @keyframes build-house {
-            0%, 15% { opacity: 0; transform: translateY(-10px); }
-            20%, 80% { opacity: 1; transform: translateY(0); }
-            100% { opacity: 0; }
-        }
-
-        @keyframes build-roof {
-            0%, 30% { opacity: 0; transform: translateY(-20px); }
-            40%, 80% { opacity: 1; transform: translateY(0); }
-            100% { opacity: 0; }
-        }
-
-        /* Responsive */
-        @media (max-width: 800px) {
-            html, body { height: auto; min-height: 100vh; overflow-y: auto; overflow-x: hidden; }
-            .app-container { height: auto; min-height: 100vh; overflow: visible; display: block; }
-            .header { padding: 1rem; flex-wrap: wrap; gap: 1rem; height: auto; display: flex; flex-direction: column; align-items: center; }
-            .header h1 { font-size: 1.2rem; }
-            .header-actions { width: 100%; justify-content: center; }
-            .main-layout { flex-direction: column; overflow: visible; display: block; }
-            .sidebar { width: 100%; border-right: none; overflow: visible; padding: 1rem; }
-            .content-area { overflow: visible; padding: 1rem; }
-            .resultados-container { padding: 1rem; }
-            .form-grid { grid-template-columns: 1fr; }
-            .idea-body { padding: 1rem; }
-            .mockup-container { width: 100%; max-width: 320px; }
-        }
+      }
     </style>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-</head>
-<body>
+  </head>
+  <body>
     <div class="app-container">
-        <header class="header">
-            <h1>
-                <img src="https://argentina.techo.org/wp-content/uploads/sites/8/2026/04/Capa_1-1-1.svg" alt="TECHO" style="height: 32px; object-fit: contain;" referrerPolicy="no-referrer" />
-                <div style="position:relative; display:inline-block; margin-left: 16px; margin-top: 2px;">
-                    <div style="position:absolute; inset:-2px -12px; background:var(--techo-accent); transform:skewX(-12deg); z-index:0; border:2px solid var(--techo-black); box-shadow: 2px 2px 0px 0px var(--techo-black);"></div>
-                    <span style="position:relative; z-index:1; font-family: var(--font-marker); color: var(--techo-blue); font-size: 1.1em; font-weight: normal; letter-spacing: 2px;">LAB</span>
-                </div>
-            </h1>
-            <div class="header-actions">
-                <button class="btn btn-outline" onclick="toggleTheme()" id="themeToggle" style="padding: 0.5rem; width: 36px; height: 36px; display:flex; justify-content:center; align-items:center;" aria-label="Toggle Dark Mode" title="Cambiar Tema">
-                    <svg id="themeIconDark" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:none;"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
-                    <svg id="themeIconLight" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
-                </button>
-                <span id="apiStatus" class="api-badge missing">Sin API Key</span>
-                <button class="btn btn-outline" onclick="openConfigModal()">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right:4px"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg> Acceder
-                </button>
+      <header class="header">
+        <h1>
+          <img
+            src="https://argentina.techo.org/wp-content/uploads/sites/8/2026/04/Capa_1-1-1.svg"
+            alt="TECHO"
+            style="height: 32px; object-fit: contain"
+            referrerpolicy="no-referrer"
+          />
+          <div
+            style="
+              position: relative;
+              display: inline-block;
+              margin-left: 16px;
+              margin-top: 2px;
+            "
+          >
+            <div
+              style="
+                position: absolute;
+                inset: -2px -12px;
+                background: var(--techo-accent);
+                transform: skewX(-12deg);
+                z-index: 0;
+                border: 2px solid var(--techo-black);
+                box-shadow: 2px 2px 0px 0px var(--techo-black);
+              "
+            ></div>
+            <span
+              style="
+                position: relative;
+                z-index: 1;
+                font-family: var(--font-marker);
+                color: var(--techo-blue);
+                font-size: 1.1em;
+                font-weight: normal;
+                letter-spacing: 2px;
+              "
+              >LAB</span
+            >
+          </div>
+        </h1>
+        <div class="header-actions">
+          <button
+            class="btn btn-outline"
+            onclick="toggleTheme()"
+            id="themeToggle"
+            style="
+              padding: 0.5rem;
+              width: 36px;
+              height: 36px;
+              display: flex;
+              justify-content: center;
+              align-items: center;
+            "
+            aria-label="Toggle Dark Mode"
+            title="Cambiar Tema"
+          >
+            <svg
+              id="themeIconDark"
+              width="16"
+              height="16"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              style="display: none"
+            >
+              <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+            </svg>
+            <svg
+              id="themeIconLight"
+              width="16"
+              height="16"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <circle cx="12" cy="12" r="5"></circle>
+              <line x1="12" y1="1" x2="12" y2="3"></line>
+              <line x1="12" y1="21" x2="12" y2="23"></line>
+              <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+              <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+              <line x1="1" y1="12" x2="3" y2="12"></line>
+              <line x1="21" y1="12" x2="23" y2="12"></line>
+              <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+              <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+            </svg>
+          </button>
+          <span id="apiStatus" class="api-badge missing">Sin API Key</span>
+          <button class="btn btn-outline" onclick="openConfigModal()">
+            <svg
+              width="16"
+              height="16"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              style="margin-right: 4px"
+            >
+              <circle cx="12" cy="12" r="3" />
+              <path
+                d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"
+              />
+            </svg>
+            Acceder
+          </button>
+        </div>
+      </header>
+
+      <main class="main-layout">
+        <aside class="sidebar">
+          <div class="card">
+            <div class="tabs">
+              <button
+                class="tab-btn active"
+                onclick="switchMainTab('generador')"
+                id="tabGenerador"
+              >
+                Generador
+              </button>
+              <button
+                class="tab-btn"
+                onclick="switchMainTab('historial')"
+                id="tabHistorial"
+              >
+                Historial
+              </button>
+              <button
+                class="tab-btn"
+                onclick="switchMainTab('favoritos')"
+                id="tabFavoritos"
+              >
+                Favoritos
+              </button>
             </div>
-        </header>
 
-        <main class="main-layout">
-            <aside class="sidebar">
-                <div class="card">
-                    <div class="tabs">
-                        <button class="tab-btn active" onclick="switchMainTab('generador')" id="tabGenerador">Generador</button>
-                        <button class="tab-btn" onclick="switchMainTab('historial')" id="tabHistorial">Historial</button>
-                        <button class="tab-btn" onclick="switchMainTab('favoritos')" id="tabFavoritos">Favoritos</button>
-                    </div>
-
-                    <div id="panelGenerador" class="tab-content active">
-                        <div class="mode-selector">
-                            <div class="mode-btn active" onclick="setMode('libre')" id="btnModeLibre">Ideas Libres</div>
-                            <div class="mode-btn" onclick="setMode('tema')" id="btnModeTema">Tengo un tema</div>
-                        </div>
-
-                        <div id="temaContainer" style="display: none;">
-                            <div class="form-group">
-                                <label class="form-label">¿Sobre qué querés publicar?</label>
-                                <textarea id="inputTema" class="form-control" placeholder="Ej: Nueva colecta en barrio Solís Pizarro..."></textarea>
-                            </div>
-                        </div>
-
-                        <div class="form-group">
-                            <label class="form-label">Red Social</label>
-                            <select id="inputRed" class="form-control">
-                                <option value="Instagram">Instagram</option>
-                                <option value="TikTok">TikTok</option>
-                                <option value="Instagram y TikTok">Ambas</option>
-                            </select>
-                        </div>
-
-                        <div class="form-group">
-                            <label class="form-label">Tipos de Contenido</label>
-                            <div class="checkbox-grid">
-                                <label class="check-label"><input type="checkbox" name="tipoContenido" value="post estático" checked> Post Estático</label>
-                                <label class="check-label"><input type="checkbox" name="tipoContenido" value="carrusel" checked> Carrusel</label>
-                                <label class="check-label"><input type="checkbox" name="tipoContenido" value="reel" checked> Reel</label>
-                                <label class="check-label"><input type="checkbox" name="tipoContenido" value="story" checked> Story</label>
-                            </div>
-                        </div>
-
-                        <div class="form-group">
-                            <label class="form-label">Tono de la publicación</label>
-                            <select id="inputTono" class="form-control">
-                                <option value="mix">Mix (Variado)</option>
-                                <option value="convocante">Convocante (Plural, sencillo, entusiasta)</option>
-                                <option value="inspirador">Inspirador (Storyteller, formador, optimista)</option>
-                                <option value="determinado">Determinado (Desafiante, innovador, asertivo)</option>
-                                <option value="denunciante">Denunciante (Defensor de derechos, experto, valiente)</option>
-                            </select>
-                        </div>
-
-                        <div class="form-group">
-                            <label class="form-label">Cantidad de ideas: <span id="cantidadValue">3</span></label>
-                            <input type="range" id="inputCantidad" min="1" max="5" value="3" style="width: 100%;" oninput="document.getElementById('cantidadValue').textContent = this.value">
-                        </div>
-
-                        <button id="btnGenerar" class="btn btn-primary" style="width: 100%" onclick="generarIdeas()">
-                            <span id="btnGenerarText" style="display:flex; align-items:center; gap:8px;">
-                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m21.64 3.64-1.28-1.28a1.21 1.21 0 0 0-1.72 0L2.36 18.64a1.21 1.21 0 0 0 0 1.72l1.28 1.28a1.2 1.2 0 0 0 1.72 0L21.64 5.36a1.2 1.2 0 0 0 0-1.72Z"/><path d="m14 7 3 3"/><path d="M5 6v4"/><path d="M19 14v4"/><path d="M10 2v2"/><path d="M7 8H3"/><path d="M21 16h-4"/><path d="M11 3H9"/></svg>
-                                Generar Ideas
-                            </span>
-                        </button>
-                        <div id="errorMsg" style="color: var(--error); margin-top: 10px; font-size: 0.9rem; text-align: center; display: none;"></div>
-                    </div>
-
-                    <div id="panelHistorial" class="tab-content">
-                        <div id="historialList"></div>
-                    </div>
-
-                    <div id="panelFavoritos" class="tab-content">
-                        <div id="favoritosList"></div>
-                    </div>
+            <div id="panelGenerador" class="tab-content active">
+              <div class="mode-selector">
+                <div
+                  class="mode-btn active"
+                  onclick="setMode('libre')"
+                  id="btnModeLibre"
+                >
+                  Ideas Libres
                 </div>
-            </aside>
-
-            <div id="thematicLoader" class="thematic-loader">
-                <div class="house-builder">
-                    <div class="brick brick-1"></div>
-                    <div class="brick brick-2"></div>
-                    <div class="brick brick-3"></div>
-                    <div class="brick brick-4"></div>
-                    <div class="roof"></div>
+                <div
+                  class="mode-btn"
+                  onclick="setMode('tema')"
+                  id="btnModeTema"
+                >
+                  Tengo un tema
                 </div>
-                <h3 style="margin-bottom: 0.5rem; color: var(--techo-blue);">Construyendo Ideas...</h3>
-                <p id="thematicLoadingText" style="color: var(--text-muted); font-size: 0.9rem;">Preparando materiales...</p>
+              </div>
+
+              <div id="temaContainer" style="display: none">
+                <div class="form-group">
+                  <label class="form-label">¿Sobre qué querés publicar?</label>
+                  <textarea
+                    id="inputTema"
+                    class="form-control"
+                    placeholder="Ej: Nueva colecta en barrio Solís Pizarro..."
+                  ></textarea>
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label">Red Social</label>
+                <select id="inputRed" class="form-control">
+                  <option value="Instagram">Instagram</option>
+                  <option value="TikTok">TikTok</option>
+                  <option value="Instagram y TikTok">Ambas</option>
+                </select>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label">Tipos de Contenido</label>
+                <div class="checkbox-grid">
+                  <label class="check-label"
+                    ><input
+                      type="checkbox"
+                      name="tipoContenido"
+                      value="post estático"
+                      checked
+                    />
+                    Post Estático</label
+                  >
+                  <label class="check-label"
+                    ><input
+                      type="checkbox"
+                      name="tipoContenido"
+                      value="carrusel"
+                      checked
+                    />
+                    Carrusel</label
+                  >
+                  <label class="check-label"
+                    ><input
+                      type="checkbox"
+                      name="tipoContenido"
+                      value="reel"
+                      checked
+                    />
+                    Reel</label
+                  >
+                  <label class="check-label"
+                    ><input
+                      type="checkbox"
+                      name="tipoContenido"
+                      value="story"
+                      checked
+                    />
+                    Story</label
+                  >
+                  <label class="check-label"
+                    ><input
+                      type="checkbox"
+                      name="tipoContenido"
+                      value="Guion Reels/TikTok"
+                      checked
+                    />
+                    Guion Reels/TikTok</label
+                  >
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label">Tono de la publicación</label>
+                <select id="inputTono" class="form-control">
+                  <option value="mix">Mix (Variado)</option>
+                  <option value="convocante">
+                    Convocante (Plural, sencillo, entusiasta)
+                  </option>
+                  <option value="inspirador">
+                    Inspirador (Storyteller, formador, optimista)
+                  </option>
+                  <option value="determinado">
+                    Determinado (Desafiante, innovador, asertivo)
+                  </option>
+                  <option value="denunciante">
+                    Denunciante (Defensor de derechos, experto, valiente)
+                  </option>
+                </select>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label"
+                  >Cantidad de ideas: <span id="cantidadValue">3</span></label
+                >
+                <input
+                  type="range"
+                  id="inputCantidad"
+                  min="1"
+                  max="5"
+                  value="3"
+                  style="width: 100%"
+                  oninput="
+                    document.getElementById('cantidadValue').textContent =
+                      this.value
+                  "
+                />
+              </div>
+
+              <button
+                id="btnGenerar"
+                class="btn btn-primary"
+                style="width: 100%"
+                onclick="generarIdeas()"
+              >
+                <span
+                  id="btnGenerarText"
+                  style="display: flex; align-items: center; gap: 8px"
+                >
+                  <svg
+                    width="20"
+                    height="20"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  >
+                    <path
+                      d="m21.64 3.64-1.28-1.28a1.21 1.21 0 0 0-1.72 0L2.36 18.64a1.21 1.21 0 0 0 0 1.72l1.28 1.28a1.2 1.2 0 0 0 1.72 0L21.64 5.36a1.2 1.2 0 0 0 0-1.72Z"
+                    />
+                    <path d="m14 7 3 3" />
+                    <path d="M5 6v4" />
+                    <path d="M19 14v4" />
+                    <path d="M10 2v2" />
+                    <path d="M7 8H3" />
+                    <path d="M21 16h-4" />
+                    <path d="M11 3H9" />
+                  </svg>
+                  Generar Ideas
+                </span>
+              </button>
+              <div
+                id="errorMsg"
+                style="
+                  color: var(--error);
+                  margin-top: 10px;
+                  font-size: 0.9rem;
+                  text-align: center;
+                  display: none;
+                "
+              ></div>
             </div>
 
-            <section class="content-area" id="resultadosContainer">
-                <div class="card" style="text-align: center; color: var(--text-muted); padding: 4rem 2rem;">
-                    <h2>¡Empezá a planificar!</h2>
-                    <p style="margin-top: 1rem;">Configurá tus preferencias a la izquierda y hace clic en "Generar Ideas".</p>
-                </div>
-            </section>
-        </main>
+            <div id="panelHistorial" class="tab-content">
+              <div id="historialList"></div>
+            </div>
+
+            <div id="panelFavoritos" class="tab-content">
+              <div id="favoritosList"></div>
+            </div>
+          </div>
+        </aside>
+
+        <div id="thematicLoader" class="thematic-loader">
+          <div class="house-builder">
+            <div class="brick brick-1"></div>
+            <div class="brick brick-2"></div>
+            <div class="brick brick-3"></div>
+            <div class="brick brick-4"></div>
+            <div class="roof"></div>
+          </div>
+          <h3 style="margin-bottom: 0.5rem; color: var(--techo-blue)">
+            Construyendo Ideas...
+          </h3>
+          <p
+            id="thematicLoadingText"
+            style="
+              color: var(--text-muted);
+              font-size: 0.9rem;
+              margin-bottom: 1rem;
+            "
+          >
+            Preparando materiales...
+          </p>
+          <div
+            style="
+              width: 100%;
+              max-width: 300px;
+              height: 8px;
+              background: var(--bg-hover);
+              border-radius: 4px;
+              overflow: hidden;
+              margin: 0 auto;
+            "
+          >
+            <div
+              id="simulatedProgress"
+              style="
+                height: 100%;
+                width: 0%;
+                background: var(--techo-blue);
+                transition: width 0.5s ease;
+                border-radius: 4px;
+              "
+            ></div>
+          </div>
+          <p
+            id="progressPercentage"
+            style="
+              font-size: 0.8rem;
+              font-weight: bold;
+              color: var(--techo-blue);
+              margin-top: 0.5rem;
+              font-variant-numeric: tabular-nums;
+            "
+          >
+            0%
+          </p>
+        </div>
+
+        <section class="content-area" id="resultadosContainer">
+          <div
+            class="card"
+            style="
+              text-align: center;
+              color: var(--text-muted);
+              padding: 4rem 2rem;
+            "
+          >
+            <h2>¡Empezá a planificar!</h2>
+            <p style="margin-top: 1rem">
+              Configurá tus preferencias a la izquierda y hace clic en "Generar
+              Ideas".
+            </p>
+          </div>
+        </section>
+      </main>
     </div>
 
     <!-- Modal Compartir/Votar -->
     <div id="sharedIdeaModal" class="modal-overlay">
-        <div class="modal-content" style="max-width: 600px; max-height: 90vh; overflow-y: auto;">
-            <div class="modal-header" style="position: sticky; top: 0; background: var(--white); z-index: 10; border-bottom: 3px solid var(--techo-black);">
-                <h2>💡 Ideas de la Comunidad</h2>
-                <button class="close-btn" onclick="closeSharedModal()">×</button>
-            </div>
-            <div class="modal-body" id="sharedIdeaBody" style="padding: 1.5rem; text-align: left;">
-                <div style="text-align: center; color: var(--text-muted);">Cargando idea...</div>
-            </div>
+      <div
+        class="modal-content"
+        style="max-width: 600px; max-height: 90vh; overflow-y: auto"
+      >
+        <div
+          class="modal-header"
+          style="
+            position: sticky;
+            top: 0;
+            background: var(--white);
+            z-index: 10;
+            border-bottom: 3px solid var(--techo-black);
+          "
+        >
+          <h2>💡 Ideas de la Comunidad</h2>
+          <button class="close-btn" onclick="closeSharedModal()">×</button>
         </div>
+        <div
+          class="modal-body"
+          id="sharedIdeaBody"
+          style="padding: 1.5rem; text-align: left"
+        >
+          <div style="text-align: center; color: var(--text-muted)">
+            Cargando idea...
+          </div>
+        </div>
+      </div>
     </div>
 
     <!-- Modal Configuración -->
     <div id="configModal" class="modal-overlay">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h2>⚙️ Configuración del Generador</h2>
-                <button class="close-btn" onclick="closeConfigModal()">×</button>
-            </div>
-            <div class="modal-body">
-                <div class="tabs">
-                    <button class="tab-btn active" onclick="switchConfigTab('tabAPI')" id="btnTabAPI">Proveedor IA</button>
-                    <button class="tab-btn" onclick="switchConfigTab('tabMarca')" id="btnTabMarca">Identidad Marca</button>
-                    <button class="tab-btn" onclick="switchConfigTab('tabKeywords')" id="btnTabKeywords">Palabras Clave</button>
-                </div>
-
-                <!-- Tab API -->
-                <div id="tabAPI" class="tab-content active">
-                    <div class="form-group">
-                        <label class="form-label">Proveedor</label>
-                        <select id="cfgProvider" class="form-control" onchange="autoFillProvider()">
-                            <option value="nvidia">NVIDIA NIM</option>
-                            <option value="openrouter">OpenRouter</option>
-                            <option value="custom">URL Personalizada</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">Base URL</label>
-                        <input type="text" id="cfgBaseUrl" class="form-control">
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">API Key</label>
-                        <input type="password" id="cfgApiKey" class="form-control" placeholder="sk-...">
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">Modelo</label>
-                        <input type="text" id="cfgModel" class="form-control">
-                    </div>
-                    <div class="checkbox-grid">
-                        <div class="form-group">
-                            <label class="form-label">Temperatura</label>
-                            <input type="number" id="cfgTemp" class="form-control" step="0.1" min="0" max="2">
-                        </div>
-                        <div class="form-group">
-                            <label class="form-label">Max Tokens</label>
-                            <input type="number" id="cfgTokens" class="form-control" step="256">
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Tab Marca -->
-                <div id="tabMarca" class="tab-content">
-                    <div class="form-group">
-                        <label class="form-label">Nombre de la Organización</label>
-                        <input type="text" id="cfgOrgName" class="form-control">
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">Misión / Descripción</label>
-                        <textarea id="cfgMision" class="form-control"></textarea>
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">Público Objetivo</label>
-                        <input type="text" id="cfgPublico" class="form-control">
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">Variante de Idioma</label>
-                        <select id="cfgIdioma" class="form-control">
-                            <option value="Rioplatense + inclusivo (uso de x/e)">Rioplatense + inclusivo (uso de x/e)</option>
-                            <option value="Rioplatense estándar">Rioplatense estándar</option>
-                            <option value="Español neutro">Español neutro</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">Valores y pilares de comunicación</label>
-                        <input type="text" id="cfgValores" class="form-control">
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">Estilo visual / Paleta</label>
-                        <input type="text" id="cfgVisual" class="form-control">
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">CTA (Llamado a la acción recurrente)</label>
-                        <input type="text" id="cfgCta" class="form-control">
-                    </div>
-                </div>
-
-                <!-- Tab Keywords -->
-                <div id="tabKeywords" class="tab-content">
-                    <div class="form-group">
-                        <label class="form-label">Keywords a incluir (Enter para agregar)</label>
-                        <div class="tag-container" id="tagListKeywords">
-                            <input type="text" class="tag-input-field" id="tagInputKeywords">
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">Palabras prohibidas</label>
-                        <div class="tag-container" id="tagListForbidden">
-                            <input type="text" class="tag-input-field" id="tagInputForbidden">
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">Hashtags fijos</label>
-                        <div class="tag-container" id="tagListHashtags">
-                            <input type="text" class="tag-input-field" id="tagInputHashtags">
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">Emojis preferidos</label>
-                        <div class="tag-container" id="tagListEmojis">
-                            <input type="text" class="tag-input-field" id="tagInputEmojis">
-                        </div>
-                    </div>
-                </div>
-
-            </div>
-            <div class="modal-footer">
-                <button class="btn btn-outline" onclick="resetConfig()">Resetear Defaults</button>
-                <button class="btn btn-primary" onclick="saveConfig()">Guardar Configuración</button>
-            </div>
+      <div class="modal-content">
+        <div class="modal-header">
+          <h2>⚙️ Configuración del Generador</h2>
+          <button class="close-btn" onclick="closeConfigModal()">×</button>
         </div>
+        <div class="modal-body">
+          <div class="tabs">
+            <button
+              class="tab-btn active"
+              onclick="switchConfigTab('tabAPI')"
+              id="btnTabAPI"
+            >
+              Proveedor IA
+            </button>
+            <button
+              class="tab-btn"
+              onclick="switchConfigTab('tabMarca')"
+              id="btnTabMarca"
+            >
+              Identidad Marca
+            </button>
+            <button
+              class="tab-btn"
+              onclick="switchConfigTab('tabKeywords')"
+              id="btnTabKeywords"
+            >
+              Palabras Clave
+            </button>
+          </div>
+
+          <!-- Tab API -->
+          <div id="tabAPI" class="tab-content active">
+            <div class="form-group">
+              <label class="form-label">Proveedor</label>
+              <select
+                id="cfgProvider"
+                class="form-control"
+                onchange="autoFillProvider()"
+              >
+                <option value="nvidia">NVIDIA NIM</option>
+                <option value="openrouter">OpenRouter</option>
+                <option value="custom">URL Personalizada</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Base URL</label>
+              <input type="text" id="cfgBaseUrl" class="form-control" />
+            </div>
+            <div class="form-group">
+              <label class="form-label">API Key</label>
+              <input
+                type="password"
+                id="cfgApiKey"
+                class="form-control"
+                placeholder="sk-..."
+              />
+            </div>
+            <div class="form-group">
+              <label class="form-label">Modelo</label>
+              <input type="text" id="cfgModel" class="form-control" />
+            </div>
+            <div class="checkbox-grid">
+              <div class="form-group">
+                <label class="form-label">Temperatura</label>
+                <input
+                  type="number"
+                  id="cfgTemp"
+                  class="form-control"
+                  step="0.1"
+                  min="0"
+                  max="2"
+                />
+              </div>
+              <div class="form-group">
+                <label class="form-label">Max Tokens</label>
+                <input
+                  type="number"
+                  id="cfgTokens"
+                  class="form-control"
+                  step="256"
+                />
+              </div>
+            </div>
+          </div>
+
+          <!-- Tab Marca -->
+          <div id="tabMarca" class="tab-content">
+            <div class="form-group">
+              <label class="form-label">Nombre de la Organización</label>
+              <input type="text" id="cfgOrgName" class="form-control" />
+            </div>
+            <div class="form-group">
+              <label class="form-label">Misión / Descripción</label>
+              <textarea id="cfgMision" class="form-control"></textarea>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Público Objetivo</label>
+              <input type="text" id="cfgPublico" class="form-control" />
+            </div>
+            <div class="form-group">
+              <label class="form-label">Variante de Idioma</label>
+              <select id="cfgIdioma" class="form-control">
+                <option value="Rioplatense + inclusivo (uso de x/e)">
+                  Rioplatense + inclusivo (uso de x/e)
+                </option>
+                <option value="Rioplatense estándar">
+                  Rioplatense estándar
+                </option>
+                <option value="Español neutro">Español neutro</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label"
+                >Valores y pilares de comunicación</label
+              >
+              <input type="text" id="cfgValores" class="form-control" />
+            </div>
+            <div class="form-group">
+              <label class="form-label">Estilo visual / Paleta</label>
+              <input type="text" id="cfgVisual" class="form-control" />
+            </div>
+            <div class="form-group">
+              <label class="form-label"
+                >CTA (Llamado a la acción recurrente)</label
+              >
+              <input type="text" id="cfgCta" class="form-control" />
+            </div>
+          </div>
+
+          <!-- Tab Keywords -->
+          <div id="tabKeywords" class="tab-content">
+            <div class="form-group">
+              <label class="form-label"
+                >Keywords a incluir (Enter para agregar)</label
+              >
+              <div class="tag-container" id="tagListKeywords">
+                <input
+                  type="text"
+                  class="tag-input-field"
+                  id="tagInputKeywords"
+                />
+              </div>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Palabras prohibidas</label>
+              <div class="tag-container" id="tagListForbidden">
+                <input
+                  type="text"
+                  class="tag-input-field"
+                  id="tagInputForbidden"
+                />
+              </div>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Hashtags fijos</label>
+              <div class="tag-container" id="tagListHashtags">
+                <input
+                  type="text"
+                  class="tag-input-field"
+                  id="tagInputHashtags"
+                />
+              </div>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Emojis preferidos</label>
+              <div class="tag-container" id="tagListEmojis">
+                <input
+                  type="text"
+                  class="tag-input-field"
+                  id="tagInputEmojis"
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button class="btn btn-outline" onclick="resetConfig()">
+            Resetear Defaults
+          </button>
+          <button class="btn btn-primary" onclick="saveConfig()">
+            Guardar Configuración
+          </button>
+        </div>
+      </div>
     </div>
 
     <script>
-        // --- Estado Global ---
-        let currentMode = 'libre'; // 'libre' o 'tema'
-        let history = JSON.parse(localStorage.getItem('techo_history')) || [];
-        let favoritos = JSON.parse(localStorage.getItem('techo_favoritos')) || [];
-        
-        let theme = localStorage.getItem('techo_theme') || 'light';
-        function initTheme() {
-            if (theme === 'dark') {
-                document.documentElement.setAttribute('data-theme', 'dark');
-                document.getElementById('themeIconDark').style.display = 'block';
-                document.getElementById('themeIconLight').style.display = 'none';
-            } else {
-                document.documentElement.removeAttribute('data-theme');
-                document.getElementById('themeIconDark').style.display = 'none';
-                document.getElementById('themeIconLight').style.display = 'block';
+      // --- Estado Global ---
+      let currentMode = "libre"; // 'libre' o 'tema'
+      let history = JSON.parse(localStorage.getItem("techo_history")) || [];
+      let favoritos = JSON.parse(localStorage.getItem("techo_favoritos")) || [];
+
+      let theme = localStorage.getItem("techo_theme") || "light";
+      function initTheme() {
+        if (theme === "dark") {
+          document.documentElement.setAttribute("data-theme", "dark");
+          document.getElementById("themeIconDark").style.display = "block";
+          document.getElementById("themeIconLight").style.display = "none";
+        } else {
+          document.documentElement.removeAttribute("data-theme");
+          document.getElementById("themeIconDark").style.display = "none";
+          document.getElementById("themeIconLight").style.display = "block";
+        }
+      }
+
+      function toggleTheme() {
+        if (theme === "light") {
+          theme = "dark";
+          document.documentElement.setAttribute("data-theme", "dark");
+          document.getElementById("themeIconDark").style.display = "block";
+          document.getElementById("themeIconLight").style.display = "none";
+        } else {
+          theme = "light";
+          document.documentElement.removeAttribute("data-theme");
+          document.getElementById("themeIconDark").style.display = "none";
+          document.getElementById("themeIconLight").style.display = "block";
+        }
+        localStorage.setItem("techo_theme", theme);
+      }
+
+      let config = JSON.parse(localStorage.getItem("techo_config")) || {
+        provider: "nvidia",
+        baseUrl: "https://integrate.api.nvidia.com/v1",
+        apiKey: "",
+        model: "meta/llama3-8b-instruct",
+        temperature: 0.7,
+        maxTokens: 2048,
+        orgName: "TECHO Argentina — Capítulo Salta",
+        mision:
+          "Organización que trabaja en la superación de la pobreza extrema, construyendo viviendas de emergencia y promoviendo el desarrollo comunitario en asentamientos informales.",
+        publico:
+          "Jóvenes universitarixs argentinxs, voluntarixs actuales y potenciales, donantes, comunidad local de Salta",
+        idioma: "Rioplatense + inclusivo (uso de x/e)",
+        valores:
+          "Dignidad, trabajo colectivo, esperanza, acción directa, comunidad, transparencia",
+        visual:
+          "Celeste #0092DD + blanco. Fotografía documental auténtica. Tipografía Fredoka.",
+        cta: "Sumate como voluntarix en techo.org.ar",
+        keywords: [
+          "asentamiento",
+          "vivienda digna",
+          "comunidad",
+          "voluntarixs",
+          "construcción colectiva",
+        ],
+        forbidden: ["villa miseria", "pobres", "indigentes", "marginal"],
+        hashtags: [
+          "TECHO",
+          "TECHOArgentina",
+          "TECHOSalta",
+          "VoluntariadoJoven",
+        ],
+        emojis: ["🏠", "✊", "💙", "🔨", "🌟"],
+      };
+
+      // --- Inicialización ---
+      window.onload = () => {
+        updateApiStatus();
+        renderHistory();
+        setupTagInputs();
+      };
+
+      function updateApiStatus() {
+        const badge = document.getElementById("apiStatus");
+        if (config.apiKey && config.apiKey.trim() !== "") {
+          badge.className = "api-badge connected";
+          badge.innerHTML = "✓ API conectada";
+        } else {
+          badge.className = "api-badge missing";
+          badge.innerHTML = "⚠ Sin API Key";
+        }
+      }
+
+      // --- UI Navigation ---
+      function setMode(mode) {
+        currentMode = mode;
+        document
+          .getElementById("btnModeLibre")
+          .classList.toggle("active", mode === "libre");
+        document
+          .getElementById("btnModeTema")
+          .classList.toggle("active", mode === "tema");
+        document.getElementById("temaContainer").style.display =
+          mode === "tema" ? "block" : "none";
+      }
+
+      function switchMainTab(tab) {
+        document
+          .getElementById("tabGenerador")
+          .classList.toggle("active", tab === "generador");
+        document
+          .getElementById("tabHistorial")
+          .classList.toggle("active", tab === "historial");
+        document
+          .getElementById("tabFavoritos")
+          .classList.toggle("active", tab === "favoritos");
+        document
+          .getElementById("panelGenerador")
+          .classList.toggle("active", tab === "generador");
+        document
+          .getElementById("panelHistorial")
+          .classList.toggle("active", tab === "historial");
+        document
+          .getElementById("panelFavoritos")
+          .classList.toggle("active", tab === "favoritos");
+        if (tab === "favoritos") {
+          renderFavoritos();
+        }
+      }
+
+      // --- Config Modal ---
+      function openConfigModal() {
+        document.getElementById("cfgProvider").value =
+          config.provider || "nvidia";
+        document.getElementById("cfgBaseUrl").value = config.baseUrl || "";
+        document.getElementById("cfgApiKey").value = config.apiKey || "";
+        document.getElementById("cfgModel").value = config.model || "";
+        document.getElementById("cfgTemp").value = config.temperature || 1;
+        document.getElementById("cfgTokens").value = config.maxTokens || 4096;
+        document.getElementById("cfgOrgName").value = config.orgName || "";
+        document.getElementById("cfgMision").value = config.mision || "";
+        document.getElementById("cfgPublico").value = config.publico || "";
+        document.getElementById("cfgIdioma").value =
+          config.idioma || "Rioplatense estándar";
+        document.getElementById("cfgValores").value = config.valores || "";
+        document.getElementById("cfgVisual").value = config.visual || "";
+        document.getElementById("cfgCta").value = config.cta || "";
+
+        renderTags("tagListKeywords", config.keywords || []);
+        renderTags("tagListForbidden", config.forbidden || []);
+        renderTags("tagListHashtags", config.hashtags || []);
+        renderTags("tagListEmojis", config.emojis || []);
+
+        document.getElementById("configModal").classList.add("active");
+      }
+
+      function closeConfigModal() {
+        document.getElementById("configModal").classList.remove("active");
+      }
+
+      function switchConfigTab(tabId) {
+        document
+          .querySelectorAll("#configModal .tab-btn")
+          .forEach((btn) => btn.classList.remove("active"));
+        document
+          .querySelectorAll("#configModal .tab-content")
+          .forEach((content) => content.classList.remove("active"));
+        document
+          .getElementById(
+            "btn" + tabId.charAt(0).toUpperCase() + tabId.slice(1),
+          )
+          .classList.add("active");
+        document.getElementById(tabId).classList.add("active");
+      }
+
+      function autoFillProvider() {
+        const provider = document.getElementById("cfgProvider").value;
+        if (provider === "nvidia") {
+          document.getElementById("cfgBaseUrl").value =
+            "https://integrate.api.nvidia.com/v1";
+          document.getElementById("cfgModel").value = "meta/llama3-8b-instruct";
+        } else if (provider === "openrouter") {
+          document.getElementById("cfgBaseUrl").value =
+            "https://openrouter.ai/api/v1";
+          document.getElementById("cfgModel").value = "openai/gpt-4o-mini";
+        }
+      }
+
+      function saveConfig() {
+        config.provider = document.getElementById("cfgProvider").value;
+        config.baseUrl = document.getElementById("cfgBaseUrl").value;
+        config.apiKey = document.getElementById("cfgApiKey").value;
+        config.model = document.getElementById("cfgModel").value;
+        config.temperature =
+          parseFloat(document.getElementById("cfgTemp").value) || 0.7;
+        config.maxTokens =
+          parseInt(document.getElementById("cfgTokens").value) || 2000;
+        config.orgName = document.getElementById("cfgOrgName").value;
+        config.mision = document.getElementById("cfgMision").value;
+        config.publico = document.getElementById("cfgPublico").value;
+        config.idioma = document.getElementById("cfgIdioma").value;
+        config.valores = document.getElementById("cfgValores").value;
+        config.visual = document.getElementById("cfgVisual").value;
+        config.cta = document.getElementById("cfgCta").value;
+
+        config.keywords = getTagsFromContainer("tagListKeywords");
+        config.forbidden = getTagsFromContainer("tagListForbidden");
+        config.hashtags = getTagsFromContainer("tagListHashtags");
+        config.emojis = getTagsFromContainer("tagListEmojis");
+
+        localStorage.setItem("techo_config", JSON.stringify(config));
+        updateApiStatus();
+        closeConfigModal();
+      }
+
+      function resetConfig() {
+        localStorage.removeItem("techo_config");
+        location.reload();
+      }
+
+      // --- Tag System ---
+      function setupTagInputs() {
+        const configs = [
+          { inputId: "tagInputKeywords", containerId: "tagListKeywords" },
+          { inputId: "tagInputForbidden", containerId: "tagListForbidden" },
+          { inputId: "tagInputHashtags", containerId: "tagListHashtags" },
+          { inputId: "tagInputEmojis", containerId: "tagListEmojis" },
+        ];
+
+        configs.forEach((c) => {
+          const input = document.getElementById(c.inputId);
+          if (!input) return;
+          input.addEventListener("keydown", (e) => {
+            if (e.key === "Enter") {
+              e.preventDefault();
+              const val = input.value.trim();
+              if (val) {
+                addTagToContainer(c.containerId, val);
+                input.value = "";
+              }
             }
-        }
-        
-        function toggleTheme() {
-            if (theme === 'light') {
-                theme = 'dark';
-                document.documentElement.setAttribute('data-theme', 'dark');
-                document.getElementById('themeIconDark').style.display = 'block';
-                document.getElementById('themeIconLight').style.display = 'none';
-            } else {
-                theme = 'light';
-                document.documentElement.removeAttribute('data-theme');
-                document.getElementById('themeIconDark').style.display = 'none';
-                document.getElementById('themeIconLight').style.display = 'block';
-            }
-            localStorage.setItem('techo_theme', theme);
-        }
+          });
+        });
+      }
 
-        let config = JSON.parse(localStorage.getItem('techo_config')) || {
-            provider: 'nvidia',
-            baseUrl: 'https://integrate.api.nvidia.com/v1',
-            apiKey: '',
-            model: 'meta/llama3-8b-instruct',
-            temperature: 0.7,
-            maxTokens: 2048,
-            orgName: 'TECHO Argentina — Capítulo Salta',
-            mision: 'Organización que trabaja en la superación de la pobreza extrema, construyendo viviendas de emergencia y promoviendo el desarrollo comunitario en asentamientos informales.',
-            publico: 'Jóvenes universitarixs argentinxs, voluntarixs actuales y potenciales, donantes, comunidad local de Salta',
-            idioma: 'Rioplatense + inclusivo (uso de x/e)',
-            valores: 'Dignidad, trabajo colectivo, esperanza, acción directa, comunidad, transparencia',
-            visual: 'Celeste #0092DD + blanco. Fotografía documental auténtica. Tipografía Fredoka.',
-            cta: 'Sumate como voluntarix en techo.org.ar',
-            keywords: ['asentamiento', 'vivienda digna', 'comunidad', 'voluntarixs', 'construcción colectiva'],
-            forbidden: ['villa miseria', 'pobres', 'indigentes', 'marginal'],
-            hashtags: ['TECHO', 'TECHOArgentina', 'TECHOSalta', 'VoluntariadoJoven'],
-            emojis: ['🏠', '✊', '💙', '🔨', '🌟']
-        };
+      function addTagToContainer(containerId, text) {
+        const container = document.getElementById(containerId);
+        const input = container.querySelector(".tag-input-field");
 
-        // --- Inicialización ---
-        window.onload = () => {
-            updateApiStatus();
-            renderHistory();
-            setupTagInputs();
-        };
-
-        function updateApiStatus() {
-            const badge = document.getElementById('apiStatus');
-            if(config.apiKey && config.apiKey.trim() !== '') {
-                badge.className = 'api-badge connected';
-                badge.innerHTML = '✓ API conectada';
-            } else {
-                badge.className = 'api-badge missing';
-                badge.innerHTML = '⚠ Sin API Key';
-            }
-        }
-
-        // --- UI Navigation ---
-        function setMode(mode) {
-            currentMode = mode;
-            document.getElementById('btnModeLibre').classList.toggle('active', mode === 'libre');
-            document.getElementById('btnModeTema').classList.toggle('active', mode === 'tema');
-            document.getElementById('temaContainer').style.display = mode === 'tema' ? 'block' : 'none';
-        }
-
-        function switchMainTab(tab) {
-            document.getElementById('tabGenerador').classList.toggle('active', tab === 'generador');
-            document.getElementById('tabHistorial').classList.toggle('active', tab === 'historial');
-            document.getElementById('tabFavoritos').classList.toggle('active', tab === 'favoritos');
-            document.getElementById('panelGenerador').classList.toggle('active', tab === 'generador');
-            document.getElementById('panelHistorial').classList.toggle('active', tab === 'historial');
-            document.getElementById('panelFavoritos').classList.toggle('active', tab === 'favoritos');
-            if (tab === 'favoritos') {
-                renderFavoritos();
-            }
-        }
-
-        // --- Config Modal ---
-        function openConfigModal() {
-            document.getElementById('cfgProvider').value = config.provider || 'nvidia';
-            document.getElementById('cfgBaseUrl').value = config.baseUrl || '';
-            document.getElementById('cfgApiKey').value = config.apiKey || '';
-            document.getElementById('cfgModel').value = config.model || '';
-            document.getElementById('cfgTemp').value = config.temperature || 1;
-            document.getElementById('cfgTokens').value = config.maxTokens || 4096;
-            document.getElementById('cfgOrgName').value = config.orgName || '';
-            document.getElementById('cfgMision').value = config.mision || '';
-            document.getElementById('cfgPublico').value = config.publico || '';
-            document.getElementById('cfgIdioma').value = config.idioma || 'Rioplatense estándar';
-            document.getElementById('cfgValores').value = config.valores || '';
-            document.getElementById('cfgVisual').value = config.visual || '';
-            document.getElementById('cfgCta').value = config.cta || '';
-            
-            renderTags('tagListKeywords', config.keywords || []);
-            renderTags('tagListForbidden', config.forbidden || []);
-            renderTags('tagListHashtags', config.hashtags || []);
-            renderTags('tagListEmojis', config.emojis || []);
-
-            document.getElementById('configModal').classList.add('active');
-        }
-
-        function closeConfigModal() {
-            document.getElementById('configModal').classList.remove('active');
-        }
-
-        function switchConfigTab(tabId) {
-            document.querySelectorAll('#configModal .tab-btn').forEach(btn => btn.classList.remove('active'));
-            document.querySelectorAll('#configModal .tab-content').forEach(content => content.classList.remove('active'));
-            document.getElementById('btn' + tabId.charAt(0).toUpperCase() + tabId.slice(1)).classList.add('active');
-            document.getElementById(tabId).classList.add('active');
-        }
-
-        function autoFillProvider() {
-            const provider = document.getElementById('cfgProvider').value;
-            if(provider === 'nvidia') {
-                document.getElementById('cfgBaseUrl').value = 'https://integrate.api.nvidia.com/v1';
-                document.getElementById('cfgModel').value = 'meta/llama3-8b-instruct';
-            } else if (provider === 'openrouter') {
-                document.getElementById('cfgBaseUrl').value = 'https://openrouter.ai/api/v1';
-                document.getElementById('cfgModel').value = 'openai/gpt-4o-mini';
-            }
-        }
-
-        function saveConfig() {
-            config.provider = document.getElementById('cfgProvider').value;
-            config.baseUrl = document.getElementById('cfgBaseUrl').value;
-            config.apiKey = document.getElementById('cfgApiKey').value;
-            config.model = document.getElementById('cfgModel').value;
-            config.temperature = parseFloat(document.getElementById('cfgTemp').value) || 0.7;
-            config.maxTokens = parseInt(document.getElementById('cfgTokens').value) || 2000;
-            config.orgName = document.getElementById('cfgOrgName').value;
-            config.mision = document.getElementById('cfgMision').value;
-            config.publico = document.getElementById('cfgPublico').value;
-            config.idioma = document.getElementById('cfgIdioma').value;
-            config.valores = document.getElementById('cfgValores').value;
-            config.visual = document.getElementById('cfgVisual').value;
-            config.cta = document.getElementById('cfgCta').value;
-            
-            config.keywords = getTagsFromContainer('tagListKeywords');
-            config.forbidden = getTagsFromContainer('tagListForbidden');
-            config.hashtags = getTagsFromContainer('tagListHashtags');
-            config.emojis = getTagsFromContainer('tagListEmojis');
-
-            localStorage.setItem('techo_config', JSON.stringify(config));
-            updateApiStatus();
-            closeConfigModal();
-        }
-
-        function resetConfig() {
-            localStorage.removeItem('techo_config');
-            location.reload();
-        }
-
-        // --- Tag System ---
-        function setupTagInputs() {
-            const configs = [
-                {inputId: 'tagInputKeywords', containerId: 'tagListKeywords'},
-                {inputId: 'tagInputForbidden', containerId: 'tagListForbidden'},
-                {inputId: 'tagInputHashtags', containerId: 'tagListHashtags'},
-                {inputId: 'tagInputEmojis', containerId: 'tagListEmojis'}
-            ];
-
-            configs.forEach(c => {
-                const input = document.getElementById(c.inputId);
-                if(!input) return;
-                input.addEventListener('keydown', (e) => {
-                    if (e.key === 'Enter') {
-                        e.preventDefault();
-                        const val = input.value.trim();
-                        if (val) {
-                            addTagToContainer(c.containerId, val);
-                            input.value = '';
-                        }
-                    }
-                });
-            });
-        }
-
-        function addTagToContainer(containerId, text) {
-            const container = document.getElementById(containerId);
-            const input = container.querySelector('.tag-input-field');
-            
-            const tag = document.createElement('div');
-            tag.className = 'tag';
-            tag.innerHTML = `
+        const tag = document.createElement("div");
+        tag.className = "tag";
+        tag.innerHTML = `
                 <span class="tag-text">${text}</span>
                 <span class="tag-close" onclick="this.parentElement.remove()">×</span>
             `;
-            container.insertBefore(tag, input);
-        }
+        container.insertBefore(tag, input);
+      }
 
-        function renderTags(containerId, tagArray) {
-            const container = document.getElementById(containerId);
-            const input = container.querySelector('.tag-input-field');
-            // Remove existing tags
-            container.querySelectorAll('.tag').forEach(t => t.remove());
-            // Add new
-            tagArray.forEach(t => {
-                const tag = document.createElement('div');
-                tag.className = 'tag';
-                tag.innerHTML = `
+      function renderTags(containerId, tagArray) {
+        const container = document.getElementById(containerId);
+        const input = container.querySelector(".tag-input-field");
+        // Remove existing tags
+        container.querySelectorAll(".tag").forEach((t) => t.remove());
+        // Add new
+        tagArray.forEach((t) => {
+          const tag = document.createElement("div");
+          tag.className = "tag";
+          tag.innerHTML = `
                     <span class="tag-text">${t}</span>
                     <span class="tag-close" onclick="this.parentElement.remove()">×</span>
                 `;
-                container.insertBefore(tag, input);
-            });
+          container.insertBefore(tag, input);
+        });
+      }
+
+      function getTagsFromContainer(containerId) {
+        const container = document.getElementById(containerId);
+        const tags = [];
+        container
+          .querySelectorAll(".tag-text")
+          .forEach((t) => tags.push(t.textContent));
+        return tags;
+      }
+
+      // --- Generación de Contenido ---
+      async function generarIdeas() {
+        if (!config.apiKey) {
+          openConfigModal();
+          showFeedbackModal(
+            "API Key Requerida",
+            "Por favor, ingresá tu API Key.",
+            "🔑",
+          );
+          return;
         }
 
-        function getTagsFromContainer(containerId) {
-            const container = document.getElementById(containerId);
-            const tags = [];
-            container.querySelectorAll('.tag-text').forEach(t => tags.push(t.textContent));
-            return tags;
+        const tiposSeleccionados = Array.from(
+          document.querySelectorAll('input[name="tipoContenido"]:checked'),
+        ).map((cb) => cb.value);
+        if (tiposSeleccionados.length === 0) {
+          showFeedbackModal(
+            "Faltan Datos",
+            "Seleccioná al menos un tipo de contenido.",
+            "ℹ️",
+          );
+          return;
         }
 
-        // --- Generación de Contenido ---
-        async function generarIdeas() {
-            if (!config.apiKey) {
-                openConfigModal();
-                showFeedbackModal('API Key Requerida', 'Por favor, ingresá tu API Key.', '🔑');
-                return;
-            }
+        const red = document.getElementById("inputRed").value;
+        const tono = document.getElementById("inputTono").value;
+        const cantidad = document.getElementById("inputCantidad").value;
+        const tema =
+          currentMode === "tema"
+            ? document.getElementById("inputTema").value
+            : "";
 
-            const tiposSeleccionados = Array.from(document.querySelectorAll('input[name="tipoContenido"]:checked')).map(cb => cb.value);
-            if(tiposSeleccionados.length === 0) {
-                showFeedbackModal('Faltan Datos', 'Seleccioná al menos un tipo de contenido.', 'ℹ️');
-                return;
-            }
+        const btn = document.getElementById("btnGenerar");
+        const btnContent = document.getElementById("btnGenerarText");
+        const errorMsg = document.getElementById("errorMsg");
 
-            const red = document.getElementById('inputRed').value;
-            const tono = document.getElementById('inputTono').value;
-            const cantidad = document.getElementById('inputCantidad').value;
-            const tema = currentMode === 'tema' ? document.getElementById('inputTema').value : '';
+        btn.disabled = true;
 
-            const btn = document.getElementById('btnGenerar');
-            const btnContent = document.getElementById('btnGenerarText');
-            const errorMsg = document.getElementById('errorMsg');
+        // Start Loading UX
+        errorMsg.style.display = "none";
+        document.getElementById("resultadosContainer").style.display = "none";
+        document.getElementById("thematicLoader").classList.add("active");
 
-            btn.disabled = true;
-            
-            // Start Loading UX
-            errorMsg.style.display = 'none';
-            document.getElementById('resultadosContainer').style.display = 'none';
-            document.getElementById('thematicLoader').classList.add('active');
-            
-            const loadingMessages = [
-                "Cimentando ideas solidarias...",
-                "Levantando los pilares del mensaje...",
-                "Estructurando copys efectivos...",
-                "Construyendo la identidad visual...",
-                "Poniendo el techo de la creatividad...",
-                "¡Casi listo!"
-            ];
-            
-            let messageIndex = 0;
-            const originalBtnContent = btnContent.innerHTML;
-            
-            btnContent.innerHTML = `<svg class="loader-svg animate-spin" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="animation: spin 1s linear infinite;"><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg> <span>Generando...</span>`;
-            
-            const thematicTextEl = document.getElementById('thematicLoadingText');
-            thematicTextEl.textContent = loadingMessages[0];
+        const loadingMessages = [
+          "Cimentando ideas solidarias...",
+          "Levantando los pilares del mensaje...",
+          "Estructurando copys efectivos...",
+          "Construyendo la identidad visual...",
+          "Poniendo el techo de la creatividad...",
+          "¡Casi listo!",
+        ];
+
+        let messageIndex = 0;
+        const originalBtnContent = btnContent.innerHTML;
+
+        btnContent.innerHTML = `<svg class="loader-svg animate-spin" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="animation: spin 1s linear infinite;"><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg> <span>Generando...</span>`;
+
+        const thematicTextEl = document.getElementById("thematicLoadingText");
+        thematicTextEl.textContent = loadingMessages[0];
+        messageIndex++;
+
+        const progressEl = document.getElementById("simulatedProgress");
+        const percentEl = document.getElementById("progressPercentage");
+        let progressValue = 0;
+        progressEl.style.width = "0%";
+        percentEl.textContent = "0%";
+
+        const loadingInterval = setInterval(() => {
+          if (thematicTextEl) {
+            thematicTextEl.textContent =
+              loadingMessages[messageIndex % loadingMessages.length];
             messageIndex++;
+          }
+        }, 2500);
 
-            const loadingInterval = setInterval(() => {
-                if(thematicTextEl) {
-                    thematicTextEl.textContent = loadingMessages[messageIndex % loadingMessages.length];
-                    messageIndex++;
-                }
-            }, 2000);
+        // Simulated progress logic: approaches 95% asymptotically
+        const progressInterval = setInterval(() => {
+          const step = (95 - progressValue) * 0.02;
+          progressValue += step;
+          if (progressValue > 95) progressValue = 95;
+          const rounded = Math.floor(progressValue);
+          if (progressEl) progressEl.style.width = rounded + "%";
+          if (percentEl) percentEl.textContent = rounded + "%";
+        }, 500);
 
-            let promptUser = `Quiero ${cantidad} ideas de contenido para ${red}.
-Tipos permitidos: ${tiposSeleccionados.join(', ')}.
+        let promptUser = `Quiero ${cantidad} ideas de contenido para ${red}.
+Tipos permitidos: ${tiposSeleccionados.join(", ")}.
 Tono: ${tono}.`;
-            if (currentMode === 'tema' && tema.trim()) {
-                promptUser += `\nTema principal: ${tema}.`;
-            } else {
-                promptUser += `\nGenerá ideas libres relevantes para la organización.`;
-            }
+        if (currentMode === "tema" && tema.trim()) {
+          promptUser += `\nTema principal: ${tema}.`;
+        } else {
+          promptUser += `\nGenerá ideas libres relevantes para la organización.`;
+        }
 
-            let basePersona = `- Personalidad base: Persona TECHO "El Influencer comunitario". Alguien joven (generación Z), activista, entusiasta e idealista que todos conocen en la comunidad. Trabajador/a, enérgic/a y con gran capacidad de liderazgo. No le importan los estereotipos ni el "qué dirán", pone el foco en generar un cambio real y práctico con cuidado y afecto.
+        let basePersona = `- Personalidad base: Persona TECHO "El Influencer comunitario". Alguien joven (generación Z), activista, entusiasta e idealista que todos conocen en la comunidad. Trabajador/a, enérgic/a y con gran capacidad de liderazgo. No le importan los estereotipos ni el "qué dirán", pone el foco en generar un cambio real y práctico con cuidado y afecto.
 - Dialecto: Voseo argentino natural. Podés utilizar lenguaje inclusivo.
 - Uso de Emojis: Estratégico para abrir frases, cerrar ideas y reforzar el sentimiento, sin saturar.`;
 
-            let tonoSpecs = "";
-            let tonoId = "mix";
-            if (tono.includes('convocante') || tono.includes('Convocante')) tonoId = 'convocante';
-            else if (tono.includes('inspirador') || tono.includes('Inspirador')) tonoId = 'inspirador';
-            else if (tono.includes('determinado') || tono.includes('Determinado')) tonoId = 'determinado';
-            else if (tono.includes('denunciante') || tono.includes('Denunciante')) tonoId = 'denunciante';
+        let tonoSpecs = "";
+        let tonoId = "mix";
+        if (tono.includes("convocante") || tono.includes("Convocante"))
+          tonoId = "convocante";
+        else if (tono.includes("inspirador") || tono.includes("Inspirador"))
+          tonoId = "inspirador";
+        else if (tono.includes("determinado") || tono.includes("Determinado"))
+          tonoId = "determinado";
+        else if (tono.includes("denunciante") || tono.includes("Denunciante"))
+          tonoId = "denunciante";
 
-            if (tonoId === 'convocante') {
-                tonoSpecs = `- Pilar Verbal: Convocante (Plural, sencilla y clara, entusiasta y enérgica).
+        if (tonoId === "convocante") {
+          tonoSpecs = `- Pilar Verbal: Convocante (Plural, sencilla y clara, entusiasta y enérgica).
 - Reglas: Hablar siempre en plural invitando a la acción. Tutear y mostrar diversidad. Explicar temas complejos con sencillez y lenguaje común. Usar exclamaciones y sonrisas. NO usar el singular, ni ser formal en redes, ni extenso, ni usar lenguaje vulgar. Sin hiperactividad ni positividad irreal.
 - Ejemplo de COPY: "El 25, 26 y 27 junto familias, estudiantes y empresas construimos 8 viviendas de emergencia en la comunidad 😃 Más de 70 personas nos movilizamos para compartir un hermoso finde 🤯 Porque ser voluntario y voluntario es decirle a la sociedad que esto no puede seguir así. Para más info, link en bio. ¡En TECHO comenzó y no para! #NadieEnUnPisoDeTierra"`;
-            } else if (tonoId === 'inspirador') {
-                tonoSpecs = `- Pilar Verbal: Inspiradora (Storyteller, formadora, optimista).
+        } else if (tonoId === "inspirador") {
+          tonoSpecs = `- Pilar Verbal: Inspiradora (Storyteller, formadora, optimista).
 - Reglas: Contar historias detrás de lo que hacemos (citas, historias de vida). Compartir conocimientos y experiencias. Ser sensibles y emocionarse. NO hablar de causas solas, sin contexto, ni ser genéricos, hiper-extensos, docentes prepotentes ni pesimistas.
 - Ejemplo de COPY: "«Una vez que estás en TECHO, la lluvia gana nuevo sentido». Hoy te contamos la historia de Maria. «Empecé como muchos. Quería ayudar, quería ser útil, pero no sabía cómo hasta que encontré a TECHO. No solo me dieron las herramientas necesarias para hacer un cambio real, sino que me dieron un propósito...» Lo dijo María y lo sabemos todos. Juntos somos imparables ✊🏽 #TransformandoRealidades"`;
-            } else if (tonoId === 'determinado') {
-                tonoSpecs = `- Pilar Verbal: Determinada (Desafiante, innovadora, asertiva).
+        } else if (tonoId === "determinado") {
+          tonoSpecs = `- Pilar Verbal: Determinada (Desafiante, innovadora, asertiva).
 - Reglas: Hacer bromas y divertirse. Interpelar a voluntarios puntuales y desafiar límites. Razonablemente audaz y emprendedor. Decir las cosas como son (directo, expresiones comunes). NO ser competitivo, burlón, ni agresivo. Evitar positividad tóxica y no ser partidista.
 - Ejemplo de COPY: "Cada vez estamos más cerca de llegar a la meta para reconstruir Sierra Larga, desafiemos nuestros límites y redoblemos nuestros esfuerzos. El pasado fin de semana vivimos uno de los eventos más increíbles 🎈🎉... No podemos mirar hacia un costado, hay familias desplazadas... Todavía tenemos mucho por hacer pero sabemos que si seguimos trabajando juntos, podemos cambiar esta realidad! ✊ Hacé tu donación..."`;
-            } else if (tonoId === 'denunciante') {
-                tonoSpecs = `- Pilar Verbal: Denunciante (Defendemos derechos, expertos, valientes).
+        } else if (tonoId === "denunciante") {
+          tonoSpecs = `- Pilar Verbal: Denunciante (Defendemos derechos, expertos, valientes).
 - Reglas: Posicionar la opinión en defensa de los derechos de la población de los asentamientos. Somos directos, compartimos datos y fuentes. Denunciamos y somos frontales ante injusticias. NO somos agresivos ni partidistas. NO hacemos afirmaciones sin datos ni interpelamos a personajes públicos específicos.
 - Ejemplo de COPY: "Creemos en las ciudades justas 🤝. Creemos en las comunidades en las que todos forman parte... Por eso también creemos que no podemos quedarnos callados. Porque hay más de 5 millones de personas en situación de pobreza extrema, viviendo en asentamientos populares donde la mayoría no cuenta con acceso a... Es el deber de todos ayudar... y vos qué estás esperando para cambiar esta realidad? 🦾 #DescubriteHaciendo"`;
-            } else {
-                tonoSpecs = `- Pilares Verbales: Mix de Convocante, Inspirador, Determinado y Denunciante. Usá distintas aproximaciones equilibrando la denuncia basada en datos, historias inspiradoras, convocatorias plurales y metas desafiantes.`;
-            }
+        } else {
+          tonoSpecs = `- Pilares Verbales: Mix de Convocante, Inspirador, Determinado y Denunciante. Usá distintas aproximaciones equilibrando la denuncia basada en datos, historias inspiradoras, convocatorias plurales y metas desafiantes.`;
+        }
 
-            let systemPrompt = `Sos une asistente de community management para ${config.orgName}.
+        let systemPrompt = `Sos une asistente de community management para ${config.orgName}.
 
 MISIÓN: ${config.mision}
 PÚBLICO: ${config.publico}
 VALORES: ${config.valores}
 ESTILO VISUAL: ${config.visual}
 CTA RECURRENTE: ${config.cta}
-PALABRAS CLAVE A INCLUIR: ${config.keywords.join(', ')}
-PALABRAS PROHIBIDAS (NUNCA USAR): ${config.forbidden.join(', ')}
-HASHTAGS FIJOS: ${config.hashtags.join(' ')}
-EMOJIS PREFERIDOS: ${config.emojis.join(' ')}
+PALABRAS CLAVE A INCLUIR: ${config.keywords.join(", ")}
+PALABRAS PROHIBIDAS (NUNCA USAR): ${config.forbidden.join(", ")}
+HASHTAGS FIJOS: ${config.hashtags.join(" ")}
+EMOJIS PREFERIDOS: ${config.emojis.join(" ")}
 
 TONO DE VOZ ESTRICTO (OBLIGATORIO PARA TODA RESPUESTA):
 ${basePersona}
 ${tonoSpecs}`;
 
-            systemPrompt += `\n\nRespondé ÚNICAMENTE con un JSON válido. Sin texto adicional, sin bloques de código markdown.
+        systemPrompt += `\n\nRespondé ÚNICAMENTE con un JSON válido. Sin texto adicional, sin bloques de código markdown.
 
 Formato exacto esperado (ejemplo de array con 1 elemento):
 {
   "ideas": [
     {
-      "tipo": "post estático|carrusel|reel|story",
+      "tipo": "post estático|carrusel|reel|story|Guion Reels/TikTok",
       "red": "Instagram|TikTok|Ambas",
-              "concepto": "Idea central en 2-3 oraciones",
-      "copy": "ÚNICAMENTE el texto final que va en la descripción (caption) de la publicación. Si es story dejalo VACÍO.",
-      "visual": "Breve descripción visual. (Si es story, describí el texto en pantalla y fondo)."
+      "concepto": "Idea central en 2-3 oraciones",
+      "copy": "ÚNICAMENTE el texto final que va en la descripción (caption). Si es story dejalo VACÍO.",
+      "visual": "Breve descripción visual. (Si es story, texto en pantalla. Si es Guion Reels/TikTok, ESTE ES EL CAMPO DONDE VA EL GUION TEXTUAL, planos de cámara, locutor y sugerencia de música o efectos)."
     }
   ]
 }
@@ -1404,113 +2032,142 @@ REGLAS CRÍTICAS (PARA VELOCIDAD Y FORMATO JSON):
 
 IDIOMA: ${config.idioma}
 Reglas hiper estrictas por formato:
-- NUNCA pongas descripciones visuales, indicaciones de cámara, notas de audio, o 'Slide X' dentro del campo 'copy'. El 'copy' es estrictamente el epígrafe/texto final.
-- Todo lo relacionado a cómo se ve el post (guion del reel, texto en pantalla, diseño del carrusel, stickers en stories) DEBE ir exclusivamente en el campo 'visual'.`;
+- NUNCA NUNCA pongas descripciones visuales, nombres de planos, diálogos enteros, guiones completos, indicaciones de cámara, notas de audio, o 'Slide X' dentro del campo 'copy'. El 'copy' es estrictamente el epígrafe/texto final.
+- Todo lo relacionado a cómo se ve el post y qué transcurre en el video (guion completo, texto en pantalla, diseño del carrusel, stickers en stories) DEBE ir exclusivamente en el campo 'visual'.`;
 
-            try {
-                let currentMaxTokens = config.maxTokens || 2000;
-                if(currentMaxTokens < 500) currentMaxTokens = 2000;
+        try {
+          let currentMaxTokens = config.maxTokens || 2000;
+          if (currentMaxTokens < 500) currentMaxTokens = 2000;
 
-                const requestBody = {
-                    model: config.model,
-                    messages: [
-                        { role: "system", content: systemPrompt },
-                        { role: "user", content: promptUser }
-                    ],
-                    temperature: config.temperature,
-                    top_p: 1,
-                    max_tokens: currentMaxTokens,
-                    stream: false
-                };
+          const requestBody = {
+            model: config.model,
+            messages: [
+              { role: "system", content: systemPrompt },
+              { role: "user", content: promptUser },
+            ],
+            temperature: config.temperature,
+            top_p: 1,
+            max_tokens: currentMaxTokens,
+            stream: false,
+          };
 
-                // Add response_format for OpenAI models via OpenRouter to ensure JSON
-                if (config.provider === 'openrouter' && config.model.includes('openai')) {
-                    requestBody.response_format = { type: "json_object" };
-                }
+          // Add response_format for OpenAI models via OpenRouter to ensure JSON
+          if (
+            config.provider === "openrouter" &&
+            config.model.includes("openai")
+          ) {
+            requestBody.response_format = { type: "json_object" };
+          }
 
-                const response = await fetch(`/api/proxy`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({
-                        url: `${config.baseUrl}/chat/completions`,
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'Authorization': `Bearer ${config.apiKey}`,
-                            'HTTP-Referer': window.location.href,
-                            'X-Title': 'TECHO Argentina Lab'
-                        },
-                        body: requestBody
-                    })
-                });
+          const response = await fetch(`/api/proxy`, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              url: `${config.baseUrl}/chat/completions`,
+              headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${config.apiKey}`,
+                "HTTP-Referer": window.location.href,
+                "X-Title": "TECHO Argentina Lab",
+              },
+              body: requestBody,
+            }),
+          });
 
-                if (!response.ok) {
-                    const errObj = await response.json().catch(()=>({}));
-                    const msg = errObj.error?.message || errObj.message || JSON.stringify(errObj);
-                    throw new Error(msg !== "{}" ? msg : `Error de conexión HTTP ${response.status}. Verificá API Key y URL.`);
-                }
+          if (!response.ok) {
+            const errObj = await response.json().catch(() => ({}));
+            const msg =
+              errObj.error?.message || errObj.message || JSON.stringify(errObj);
+            throw new Error(
+              msg !== "{}"
+                ? msg
+                : `Error de conexión HTTP ${response.status}. Verificá API Key y URL.`,
+            );
+          }
 
-                const data = await response.json();
-                
-                if (data.error) {
-                    const msg = data.error.message || JSON.stringify(data.error);
-                    throw new Error(`Error de la API: ${msg}`);
-                }
-                
-                if (!data.choices || !data.choices[0] || !data.choices[0].message) {
-                    console.error("Respuesta inesperada de la API:", data);
-                    throw new Error(`La API no devolvió el formato esperado. Revisá la configuración o consultá la consola para más detalles. Respuesta: ${JSON.stringify(data).substring(0, 100)}...`);
-                }
-                
-                let contentText = data.choices[0].message.content;
+          const data = await response.json();
 
-                // Stripping <think> blocks
-                contentText = contentText.replace(/<think>[\s\S]*?<\/think>/g, '');
-                
-                // Extracting JSON
-                const jsonMatch = contentText.match(/\{[\s\S]*\}/);
-                if (jsonMatch) contentText = jsonMatch[0];
+          if (data.error) {
+            const msg = data.error.message || JSON.stringify(data.error);
+            throw new Error(`Error de la API: ${msg}`);
+          }
 
-                let parsed;
-                try {
-                    parsed = JSON.parse(contentText);
-                } catch (parseError) {
-                    // Try to catch truncation or trailing unescaped quotes at the very end
-                    // Just provide a very clear error to the user
-                    console.error("Raw LLM Output before parsing failure:", contentText);
-                    throw new Error(`La IA generó un JSON malformado (${parseError.message}). Esto suele ocurrir si la IA escribe comillas sin escapar o si se quedó sin 'Maximum Tokens'. Probá generar nuevamente o subí los tokens en Configuración.`);
-                }
-                
-                if(!parsed.ideas || !Array.isArray(parsed.ideas)) throw new Error("La IA no devolvió la estructura de 'ideas' correcta en el JSON.");
+          if (!data.choices || !data.choices[0] || !data.choices[0].message) {
+            console.error("Respuesta inesperada de la API:", data);
+            throw new Error(
+              `La API no devolvió el formato esperado. Revisá la configuración o consultá la consola para más detalles. Respuesta: ${JSON.stringify(data).substring(0, 100)}...`,
+            );
+          }
 
-                displayResultados(parsed.ideas);
-                saveToHistory({
-                    fecha: new Date().toISOString(),
-                    modo: currentMode,
-                    tema: tema,
-                    red: red,
-                    tono: tono,
-                    ideas: parsed.ideas
-                });
+          let contentText = data.choices[0].message.content;
 
-            } catch (error) {
-                console.error(error);
-                errorMsg.textContent = `Error: ${error.message}. Revisá la configuración.`;
-                errorMsg.style.display = 'block';
-            } finally {
-                clearInterval(loadingInterval);
-                btn.disabled = false;
-                btnContent.innerHTML = originalBtnContent;
-                document.getElementById('thematicLoader').classList.remove('active');
-            }
+          // Stripping <think> blocks
+          contentText = contentText.replace(/<think>[\s\S]*?<\/think>/g, "");
+
+          // Extracting JSON
+          const jsonMatch = contentText.match(/\{[\s\S]*\}/);
+          if (jsonMatch) contentText = jsonMatch[0];
+
+          let parsed;
+          try {
+            parsed = JSON.parse(contentText);
+          } catch (parseError) {
+            // Try to catch truncation or trailing unescaped quotes at the very end
+            // Just provide a very clear error to the user
+            console.error(
+              "Raw LLM Output before parsing failure:",
+              contentText,
+            );
+            throw new Error(
+              `La IA generó un JSON malformado (${parseError.message}). Esto suele ocurrir si la IA escribe comillas sin escapar o si se quedó sin 'Maximum Tokens'. Probá generar nuevamente o subí los tokens en Configuración.`,
+            );
+          }
+
+          if (!parsed.ideas || !Array.isArray(parsed.ideas))
+            throw new Error(
+              "La IA no devolvió la estructura de 'ideas' correcta en el JSON.",
+            );
+
+          clearInterval(progressInterval);
+          if (progressEl) progressEl.style.width = "100%";
+          if (percentEl) percentEl.textContent = "100%";
+
+          setTimeout(() => {
+            playSuccessSound();
+            displayResultados(parsed.ideas);
+            saveToHistory({
+              fecha: new Date().toISOString(),
+              modo: currentMode,
+              tema: tema,
+              red: red,
+              tono: tono,
+              ideas: parsed.ideas,
+            });
+          }, 300);
+        } catch (error) {
+          console.error(error);
+          errorMsg.textContent = `Error: ${error.message}. Revisá la configuración.`;
+          errorMsg.style.display = "block";
+        } finally {
+          clearInterval(loadingInterval);
+          clearInterval(progressInterval);
+          setTimeout(() => {
+            btn.disabled = false;
+            btnContent.innerHTML = originalBtnContent;
+            document
+              .getElementById("thematicLoader")
+              .classList.remove("active");
+          }, 300);
         }
+      }
 
-        function displayResultados(ideas) {
-            currentIdeasGlobal = ideas;
-            const container = document.getElementById('resultadosContainer');
-            container.style.display = 'block';
-            container.innerHTML = `
+      function displayResultados(ideas) {
+        currentIdeasGlobal = ideas;
+        const container = document.getElementById("resultadosContainer");
+        container.style.display = "block";
+        container.innerHTML = `
                 <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:1rem; margin-bottom: 1.5rem; column-span:all;">
                     <h2 style="margin:0;">Ideas Generadas</h2>
                     <div style="display:flex; gap:0.5rem;">
@@ -1521,18 +2178,18 @@ Reglas hiper estrictas por formato:
                 </div>
             `;
 
-            ideas.forEach((idea, index) => {
-                const card = document.createElement('div');
-                card.className = 'idea-card expanded';
-                
-                let badgeClass = 'badge-post';
-                if(idea.tipo.includes('carrusel')) badgeClass = 'badge-carousel';
-                else if(idea.tipo.includes('reel')) badgeClass = 'badge-reel';
-                else if(idea.tipo.includes('story')) badgeClass = 'badge-story';
+        ideas.forEach((idea, index) => {
+          const card = document.createElement("div");
+          card.className = "idea-card expanded";
 
-                card.innerHTML = `
+          let badgeClass = "badge-post";
+          if (idea.tipo.includes("carrusel")) badgeClass = "badge-carousel";
+          else if (idea.tipo.includes("reel")) badgeClass = "badge-reel";
+          else if (idea.tipo.includes("story")) badgeClass = "badge-story";
+
+          card.innerHTML = `
                     <div class="idea-header" data-type="${idea.tipo.toLowerCase()}" onclick="this.parentElement.classList.toggle('expanded')">
-                        <span>#${index+1} — ${idea.tipo.toUpperCase()}</span>
+                        <span>#${index + 1} — ${idea.tipo.toUpperCase()}</span>
                         <span class="preview-btn-header" onclick="event.stopPropagation(); openPreviewMockup(${index})" style="margin-left:auto; margin-right: 16px; font-size: 0.8rem; background: rgba(0,0,0,0.1); padding: 4px 8px; border-radius: 4px;">👁️ Ver en Celular</span>
                         <svg class="toggle-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="transition: transform 0.3s ease"><path d="m6 9 6 6 6-6"/></svg>
                     </div>
@@ -1551,7 +2208,7 @@ Reglas hiper estrictas por formato:
                                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right:4px;vertical-align:-3px"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg> Copy / Texto
                                 <button class="btn btn-outline btn-small" style="margin-left:auto" onclick="copyToClipboard(this)">Copiar Copia</button>
                             </div>
-                            <div class="idea-copy" data-copy-text="${(idea.copy || '').replace(/"/g, '&quot;')}">${idea.copy || ''}</div>
+                            <div class="idea-copy" data-copy-text="${(idea.copy || "").replace(/"/g, "&quot;")}">${idea.copy || ""}</div>
                         </div>
 
                         <div class="idea-section" style="margin-bottom:0">
@@ -1569,66 +2226,75 @@ Reglas hiper estrictas por formato:
                         </div>
                     </div>
                 `;
-                container.appendChild(card);
-            });
-            
-            // Scroll to top of results on mobile
-            if(window.innerWidth <= 800) {
-                document.getElementById('resultadosContainer').scrollIntoView({behavior: 'smooth'});
+          container.appendChild(card);
+        });
+
+        // Scroll to top of results on mobile
+        if (window.innerWidth <= 800) {
+          document
+            .getElementById("resultadosContainer")
+            .scrollIntoView({ behavior: "smooth" });
+        }
+      }
+
+      function copyToClipboard(btn) {
+        const text =
+          btn.parentElement.parentElement.querySelector(".idea-copy").innerText;
+        navigator.clipboard.writeText(text).then(() => {
+          const orig = btn.innerText;
+          btn.innerText = "¡Copiado!";
+          setTimeout(() => (btn.innerText = orig), 2000);
+        });
+      }
+
+      // --- Historial y Favoritos ---
+      function saveToHistory(entry) {
+        history.unshift(entry);
+        if (history.length > 30) history = history.slice(0, 30);
+        localStorage.setItem("techo_history", JSON.stringify(history));
+        renderHistory();
+      }
+
+      function renderHistory() {
+        const list = document.getElementById("historialList");
+        if (history.length === 0) {
+          list.innerHTML =
+            '<p style="color:var(--text-muted); font-size:0.9rem;">No hay generaciones previas.</p>';
+          return;
+        }
+
+        list.innerHTML = "";
+        history.forEach((entry, i) => {
+          const date = new Date(entry.fecha);
+          const title =
+            entry.modo === "tema" && entry.tema
+              ? `Tema: "${entry.tema.substring(0, 30)}..."`
+              : "Ideas Libres";
+
+          const item = document.createElement("div");
+          item.className = "history-item";
+          item.style.cursor = "pointer";
+          item.onclick = () => {
+            displayResultados(entry.ideas);
+            if (window.innerWidth <= 800) {
+              document
+                .getElementById("resultadosContainer")
+                .scrollIntoView({ behavior: "smooth" });
             }
-        }
+          };
 
-        function copyToClipboard(btn) {
-            const text = btn.parentElement.parentElement.querySelector('.idea-copy').innerText;
-            navigator.clipboard.writeText(text).then(() => {
-                const orig = btn.innerText;
-                btn.innerText = '¡Copiado!';
-                setTimeout(() => btn.innerText = orig, 2000);
-            });
-        }
+          let badgesHTML = "";
+          entry.ideas.forEach((id) => {
+            let c = "badge-post";
+            if (id.tipo.includes("carrusel")) c = "badge-carousel";
+            if (id.tipo.includes("reel")) c = "badge-reel";
+            if (id.tipo.includes("story")) c = "badge-story";
+            badgesHTML += `<span class="badge ${c}" style="margin-right:4px;">${id.tipo}</span>`;
+          });
 
-        // --- Historial y Favoritos ---
-        function saveToHistory(entry) {
-            history.unshift(entry);
-            if(history.length > 30) history = history.slice(0, 30);
-            localStorage.setItem('techo_history', JSON.stringify(history));
-            renderHistory();
-        }
-
-        function renderHistory() {
-            const list = document.getElementById('historialList');
-            if(history.length === 0) {
-                list.innerHTML = '<p style="color:var(--text-muted); font-size:0.9rem;">No hay generaciones previas.</p>';
-                return;
-            }
-
-            list.innerHTML = '';
-            history.forEach((entry, i) => {
-                const date = new Date(entry.fecha);
-                const title = entry.modo === 'tema' && entry.tema ? `Tema: "${entry.tema.substring(0,30)}..."` : 'Ideas Libres';
-                
-                const item = document.createElement('div');
-                item.className = 'history-item';
-                item.style.cursor = 'pointer';
-                item.onclick = () => {
-                    displayResultados(entry.ideas);
-                    if(window.innerWidth <= 800) {
-                        document.getElementById('resultadosContainer').scrollIntoView({behavior: 'smooth'});
-                    }
-                };
-                
-                let badgesHTML = '';
-                entry.ideas.forEach(id => {
-                    let c = 'badge-post';
-                    if(id.tipo.includes('carrusel')) c = 'badge-carousel';
-                    if(id.tipo.includes('reel')) c = 'badge-reel';
-                    if(id.tipo.includes('story')) c = 'badge-story';
-                    badgesHTML += `<span class="badge ${c}" style="margin-right:4px;">${id.tipo}</span>`;
-                });
-
-                item.innerHTML = `
+          item.innerHTML = `
                     <div class="history-meta">
-                        <span>${date.toLocaleDateString()} ${date.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</span>
+                        <span>${date.toLocaleDateString()} ${date.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}</span>
                         <span style="font-weight:bold; color:var(--techo-blue)">${entry.red}</span>
                     </div>
                     <div style="font-weight:500; margin-bottom:8px;">${title}</div>
@@ -1636,100 +2302,179 @@ Reglas hiper estrictas por formato:
                         ${badgesHTML}
                     </div>
                 `;
-                list.appendChild(item);
-            });
+          list.appendChild(item);
+        });
+      }
+
+      async function compartirGeneracion() {
+        if (!currentIdeasGlobal || currentIdeasGlobal.length === 0) {
+          showFeedbackModal("Aviso", "No hay ideas para compartir.", "ℹ️");
+          return;
         }
-        
-        async function compartirGeneracion() {
-            if (!currentIdeasGlobal || currentIdeasGlobal.length === 0) {
-                showFeedbackModal('Aviso', 'No hay ideas para compartir.', 'ℹ️');
-                return;
-            }
-            
+
+        try {
+          const response = await fetch("/api/ideas/share", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ idea: currentIdeasGlobal }),
+          });
+
+          if (response.ok) {
+            const data = await response.json();
+            const shareUrl = `${window.location.origin}${window.location.pathname}?shared=${data.id}`;
+
             try {
-                const response = await fetch('/api/ideas/share', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ idea: currentIdeasGlobal })
-                });
-                
-                if (response.ok) {
-                    const data = await response.json();
-                    const shareUrl = `${window.location.origin}${window.location.pathname}?shared=${data.id}`;
-                    
-                    try {
-                        await navigator.clipboard.writeText(shareUrl);
-                        showFeedbackModal('¡Enlace copiado!', 'Compartilo para que otros voten tus ideas.', '🔗');
-                    } catch (err) {
-                        showFeedbackModal('Enlace Generado', shareUrl, '🔗');
-                    }
-                } else {
-                    showFeedbackModal('Error', 'Hubo un error al generar el enlace de compartir.', '⚠️');
-                }
+              await navigator.clipboard.writeText(shareUrl);
+              showFeedbackModal(
+                "¡Enlace copiado!",
+                "Compartilo para que otros voten tus ideas.",
+                "🔗",
+              );
             } catch (err) {
-                console.error('Error sharing:', err);
-                showFeedbackModal('Error', 'No se pudo conectar al servidor para compartir.', '⚠️');
+              showFeedbackModal("Enlace Generado", shareUrl, "🔗");
             }
+          } else {
+            showFeedbackModal(
+              "Error",
+              "Hubo un error al generar el enlace de compartir.",
+              "⚠️",
+            );
+          }
+        } catch (err) {
+          console.error("Error sharing:", err);
+          showFeedbackModal(
+            "Error",
+            "No se pudo conectar al servidor para compartir.",
+            "⚠️",
+          );
+        }
+      }
+
+      // --- Audio Effects ---
+      let audioCtx;
+      function getAudioContext() {
+        if (!audioCtx)
+          audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        if (audioCtx.state === "suspended") audioCtx.resume();
+        return audioCtx;
+      }
+
+      function playPopSound() {
+        try {
+          const ctx = getAudioContext();
+          const b = ctx.createOscillator();
+          const g = ctx.createGain();
+          b.type = "sine";
+          b.frequency.setValueAtTime(400, ctx.currentTime);
+          b.frequency.exponentialRampToValueAtTime(800, ctx.currentTime + 0.05);
+          g.gain.setValueAtTime(0, ctx.currentTime);
+          g.gain.linearRampToValueAtTime(0.5, ctx.currentTime + 0.01);
+          g.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.1);
+          b.connect(g);
+          g.connect(ctx.destination);
+          b.start();
+          b.stop(ctx.currentTime + 0.1);
+        } catch (e) {}
+      }
+
+      function playSuccessSound() {
+        try {
+          const ctx = getAudioContext();
+          const freqs = [523.25, 659.25, 783.99, 1046.5]; // C Major arpeggio
+          freqs.forEach((freq, i) => {
+            const b = ctx.createOscillator();
+            const g = ctx.createGain();
+            b.type = "triangle";
+            b.frequency.value = freq;
+            g.gain.setValueAtTime(0, ctx.currentTime + i * 0.08);
+            g.gain.linearRampToValueAtTime(
+              0.2,
+              ctx.currentTime + i * 0.08 + 0.02,
+            );
+            g.gain.exponentialRampToValueAtTime(
+              0.01,
+              ctx.currentTime + i * 0.08 + 0.2,
+            );
+            b.connect(g);
+            g.connect(ctx.destination);
+            b.start(ctx.currentTime + i * 0.08);
+            b.stop(ctx.currentTime + i * 0.08 + 0.2);
+          });
+        } catch (e) {}
+      }
+
+      // --- Favoritos Logic ---
+
+      function guardarIdeaFavorita(index) {
+        playPopSound();
+        const idea = currentIdeasGlobal[index];
+        const ideaStr = JSON.stringify(idea);
+
+        if (favoritos.some((f) => JSON.stringify(f.idea) === ideaStr)) {
+          showFeedbackModal("Aviso", "Esta idea ya está en Favoritos.", "⭐");
+          return;
         }
 
-        // --- Favoritos Logic ---
+        favoritos.unshift({ idea: idea, fecha: Date.now() });
+        localStorage.setItem("techo_favoritos", JSON.stringify(favoritos));
+        showFeedbackModal(
+          "¡Guardada!",
+          "La idea ha sido guardada en tus favoritos.",
+          "⭐",
+        );
+        if (
+          document.getElementById("tabFavoritos").classList.contains("active")
+        ) {
+          renderFavoritos();
+        }
+      }
 
-        function guardarIdeaFavorita(index) {
-            const idea = currentIdeasGlobal[index];
-            const ideaStr = JSON.stringify(idea);
-            
-            if (favoritos.some(f => JSON.stringify(f.idea) === ideaStr)) {
-                showFeedbackModal('Aviso', 'Esta idea ya está en Favoritos.', '⭐');
-                return;
-            }
-            
-            favoritos.unshift({ idea: idea, fecha: Date.now() });
-            localStorage.setItem('techo_favoritos', JSON.stringify(favoritos));
-            showFeedbackModal('¡Guardada!', 'La idea ha sido guardada en tus favoritos.', '⭐');
-            if (document.getElementById('tabFavoritos').classList.contains('active')) {
-                renderFavoritos();
-            }
+      function eliminarFavorito(event, index) {
+        event.preventDefault();
+        event.stopPropagation();
+        showConfirmModal(
+          "Eliminar de Favoritos",
+          "¿Estás seguro de que deseas eliminar esta idea de tus favoritos?",
+          () => {
+            favoritos.splice(index, 1);
+            localStorage.setItem("techo_favoritos", JSON.stringify(favoritos));
+            renderFavoritos();
+          },
+        );
+      }
+
+      function renderFavoritos() {
+        const list = document.getElementById("favoritosList");
+        if (favoritos.length === 0) {
+          list.innerHTML =
+            '<p style="color:var(--text-muted); font-size:0.9rem;">No tienes ideas guardadas en favoritos.</p>';
+          return;
         }
 
-        function eliminarFavorito(event, index) {
-            event.preventDefault();
-            event.stopPropagation();
-            showConfirmModal('Eliminar de Favoritos', '¿Estás seguro de que deseas eliminar esta idea de tus favoritos?', () => {
-                favoritos.splice(index, 1);
-                localStorage.setItem('techo_favoritos', JSON.stringify(favoritos));
-                renderFavoritos();
-            });
-        }
+        list.innerHTML = "";
+        favoritos.forEach((entry, i) => {
+          const date = new Date(entry.fecha);
+          const title = `Idea Guardada - ${entry.idea.tipo.toUpperCase()}`;
 
-        function renderFavoritos() {
-            const list = document.getElementById('favoritosList');
-            if(favoritos.length === 0) {
-                list.innerHTML = '<p style="color:var(--text-muted); font-size:0.9rem;">No tienes ideas guardadas en favoritos.</p>';
-                return;
+          const item = document.createElement("div");
+          item.className = "history-item";
+          item.style.cursor = "pointer";
+          item.onclick = () => {
+            document.getElementById("tabGenerador").click();
+            displayResultados([entry.idea]);
+            if (window.innerWidth <= 800) {
+              document
+                .getElementById("resultadosContainer")
+                .scrollIntoView({ behavior: "smooth" });
             }
+          };
 
-            list.innerHTML = '';
-            favoritos.forEach((entry, i) => {
-                const date = new Date(entry.fecha);
-                const title = `Idea Guardada - ${entry.idea.tipo.toUpperCase()}`;
-                
-                const item = document.createElement('div');
-                item.className = 'history-item';
-                item.style.cursor = 'pointer';
-                item.onclick = () => {
-                    document.getElementById('tabGenerador').click(); 
-                    displayResultados([entry.idea]);
-                    if(window.innerWidth <= 800) {
-                        document.getElementById('resultadosContainer').scrollIntoView({behavior: 'smooth'});
-                    }
-                };
-                
-                let cx = 'badge-post';
-                if(entry.idea.tipo.includes('carrusel')) cx = 'badge-carousel';
-                if(entry.idea.tipo.includes('reel')) cx = 'badge-reel';
-                if(entry.idea.tipo.includes('story')) cx = 'badge-story';
+          let cx = "badge-post";
+          if (entry.idea.tipo.includes("carrusel")) cx = "badge-carousel";
+          if (entry.idea.tipo.includes("reel")) cx = "badge-reel";
+          if (entry.idea.tipo.includes("story")) cx = "badge-story";
 
-                item.innerHTML = `
+          item.innerHTML = `
                     <div style="display:flex; justify-content:space-between; align-items:start;">
                         <div class="history-meta">
                             <span>${date.toLocaleDateString()}</span>
@@ -1745,32 +2490,42 @@ Reglas hiper estrictas por formato:
                         <span class="badge ${cx}" style="margin-right:4px;">${entry.idea.tipo}</span>
                     </div>
                 `;
-                list.appendChild(item);
-            });
-        }
+          list.appendChild(item);
+        });
+      }
 
-        let currentIdeasGlobal = [];
-        
-        function openPreviewMockup(index) {
-            const idea = currentIdeasGlobal[index];
-            if (!idea) return;
-            
-            const modal = document.getElementById('mockupModal');
-            const container = document.getElementById('mockupDynamicContainer');
-            
-            let type = 'post';
-            const ideaTipo = idea.tipo.toLowerCase();
-            if(ideaTipo.includes('reel') || ideaTipo.includes('tiktok')) type = 'reel';
-            if(ideaTipo.includes('story') || ideaTipo.includes('historia')) type = 'story';
-            
-            // Clean up the text for HTML rendering
-            const formattedCopy = (idea.copy || '').replace(/\n/g, '<br>');
-            const formattedConcepto = (idea.concepto || '').replace(/\n/g, '<br>');
-            const formattedVisual = (idea.visual || '').replace(/\n/g, '<br>');
-            
-            // Generate HTML based on what kind of content it is
-            if (type === 'reel') {
-                container.innerHTML = `
+      let currentIdeasGlobal = [];
+
+      const TECHO_SALTA_PFP =
+        "https://i.imgur.com/iIktsdS.jpeg";
+      const TECHO_SALTA_USER = "comunidadtecho_salta";
+
+      function openPreviewMockup(index) {
+        const idea = currentIdeasGlobal[index];
+        if (!idea) return;
+
+        const modal = document.getElementById("mockupModal");
+        const container = document.getElementById("mockupDynamicContainer");
+
+        let type = "post";
+        const ideaTipo = idea.tipo.toLowerCase();
+        if (
+          ideaTipo.includes("reel") ||
+          ideaTipo.includes("tiktok") ||
+          ideaTipo.includes("guion")
+        )
+          type = "reel";
+        if (ideaTipo.includes("story") || ideaTipo.includes("historia"))
+          type = "story";
+
+        // Clean up the text for HTML rendering
+        const formattedCopy = (idea.copy || "").replace(/\n/g, "<br>");
+        const formattedConcepto = (idea.concepto || "").replace(/\n/g, "<br>");
+        const formattedVisual = (idea.visual || "").replace(/\n/g, "<br>");
+
+        // Generate HTML based on what kind of content it is
+        if (type === "reel") {
+          container.innerHTML = `
                     <div style="aspect-ratio: 9/16; background: linear-gradient(180deg, #1A1D20 0%, #0d1117 100%); position: relative; color: white;">
                         <div style="position:absolute; top: 16px; left: 16px; font-weight:600; font-size:1.1rem; text-shadow: 1px 1px 3px rgba(0,0,0,0.8);">Reels</div>
                         <div style="position:absolute; right: 12px; bottom: 30px; display:flex; flex-direction:column; gap:24px; align-items:center;">
@@ -1780,23 +2535,23 @@ Reglas hiper estrictas por formato:
                         </div>
                         <div style="position:absolute; bottom:20px; left:16px; right:60px; text-shadow: 1px 1px 3px rgba(0,0,0,0.8);">
                             <div style="display:flex; align-items:center; gap:8px; margin-bottom:12px;">
-                                <div class="mockup-profile" style="width:32px; height:32px; border: 2px solid white; margin:0;">T</div>
-                                <span style="font-weight:600; font-size:0.95rem;">techo_arg</span>
+                            <div class="mockup-profile" style="width:32px; height:32px; border: 2px solid white; margin:0; padding:0; overflow:hidden;"><img src="${TECHO_SALTA_PFP}" alt="Profile" style="width:100%; height:100%; object-fit:cover;" referrerpolicy="no-referrer" crossorigin="anonymous" onerror="this.outerHTML='T'"></div>
+                                <span style="font-weight:600; font-size:0.95rem;">${TECHO_SALTA_USER}</span>
                                 <span style="border: 1px solid white; padding: 2px 8px; border-radius: 6px; font-size: 0.7rem; font-weight:600;">Seguir</span>
                             </div>
                             <div style="font-size:0.85rem; max-height:160px; overflow-y:auto; line-height:1.4; scrollbar-width: none;">${formattedCopy}</div>
                         </div>
                     </div>
                 `;
-            } else if (type === 'story') {
-                container.innerHTML = `
+        } else if (type === "story") {
+          container.innerHTML = `
                     <div style="aspect-ratio: 9/16; background: linear-gradient(45deg, var(--techo-blue), var(--techo-black)); position: relative; color: white;">
                         <div style="position:absolute; top:8px; left:8px; right:8px; display:flex; gap:4px;">
                             <div style="height:2px; background:white; flex:1; border-radius:2px;"></div>
                         </div>
                         <div style="position:absolute; top:20px; left:12px; display:flex; align-items:center; gap:8px; text-shadow: 1px 1px 2px rgba(0,0,0,0.5);">
-                            <div class="mockup-profile" style="width:32px; height:32px; border: 1px solid rgba(255,255,255,0.3); margin:0;">T</div>
-                            <span style="font-weight:600; font-size:0.9rem;">techo_arg</span>
+                            <div class="mockup-profile" style="width:32px; height:32px; border: 1px solid rgba(255,255,255,0.3); margin:0; padding:0; overflow:hidden;"><img src="${TECHO_SALTA_PFP}" alt="Profile" style="width:100%; height:100%; object-fit:cover;" referrerpolicy="no-referrer" crossorigin="anonymous" onerror="this.outerHTML='T'"></div>
+                            <span style="font-weight:600; font-size:0.9rem;">${TECHO_SALTA_USER}</span>
                             <span style="opacity:0.8; font-size:0.8rem; font-weight:500;">2h</span>
                         </div>
                         <div style="position:absolute; top:20px; right:12px; font-weight:bold; font-size:1.2rem;">...</div>
@@ -1816,79 +2571,79 @@ Reglas hiper estrictas por formato:
                         </div>
                     </div>
                 `;
-            } else {
-                // Post o Carrusel Estándar
-                container.innerHTML = `
+        } else {
+          // Post o Carrusel Estándar
+          container.innerHTML = `
                     <div class="mockup-header">
-                        <div class="mockup-profile">T</div>
-                        <div class="mockup-username">techo_arg</div>
+                        <div class="mockup-profile" style="padding:0; overflow:hidden;"><img src="${TECHO_SALTA_PFP}" alt="Profile" style="width:100%; height:100%; object-fit:cover;" referrerpolicy="no-referrer" crossorigin="anonymous" onerror="this.outerHTML='T'"></div>
+                        <div class="mockup-username">${TECHO_SALTA_USER}</div>
                         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-left:auto; color:var(--text-muted)"><circle cx="12" cy="12" r="1"/><circle cx="12" cy="5" r="1"/><circle cx="12" cy="19" r="1"/></svg>
                     </div>
                     <div class="mockup-media" style="position:relative; aspect-ratio: 4/5;">
                         <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="opacity:0.2;"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
-                        ${ideaTipo.includes('carrusel') ? '<div style="position:absolute; top:12px; right:12px; background:rgba(0,0,0,0.6); color:white; font-size:0.75rem; padding:4px 8px; border-radius:12px;">1/3</div>' : ''}
+                        ${ideaTipo.includes("carrusel") ? '<div style="position:absolute; top:12px; right:12px; background:rgba(0,0,0,0.6); color:white; font-size:0.75rem; padding:4px 8px; border-radius:12px;">1/3</div>' : ""}
                     </div>
-                    <div class="mockup-actions-bar">
+                    <div class="mockup-actions-bar" style="color: var(--techo-black);">
                         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
                         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>
                         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
                         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-left:auto"><path d="m19 21-7-4-7 4V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v16z"/></svg>
                     </div>
-                    <div class="mockup-caption">
-                        <strong>techo_arg</strong> ${formattedCopy}
-                    </div>
+                    <div class="mockup-caption"><span style="font-weight: 600;">${TECHO_SALTA_USER}</span> <span>${formattedCopy.replace(/^(<br>|\s)+/, '').replace(/^\n+/, '')}</span></div>
                 `;
-            }
-            
-            modal.style.display = 'flex';
-        }
-        function exportarTexto() {
-            if (!currentIdeasGlobal || currentIdeasGlobal.length === 0) {
-                showFeedbackModal('Aviso', 'No hay ideas para exportar.', 'ℹ️');
-                return;
-            }
-            
-            let contenido = "IDEAS GENERADAS - TECHO LAB\n\n";
-            currentIdeasGlobal.forEach((idea, index) => {
-                contenido += `--- IDEA #${index + 1} | ${idea.tipo.toUpperCase()} (${idea.red}) ---\n\n`;
-                contenido += `CONCEPTO:\n${idea.concepto}\n\n`;
-                if(idea.copy && idea.copy.trim() !== "") {
-                    contenido += `COPY (TEXTO):\n${idea.copy}\n\n`;
-                }
-                contenido += `VISUAL:\n${idea.visual}\n\n`;
-            });
-            
-            const blob = new Blob([contenido], { type: 'text/plain;charset=utf-8' });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = 'techo_ideas.txt';
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-            URL.revokeObjectURL(url);
         }
 
-        async function exportarPDF() {
-            if (!currentIdeasGlobal || currentIdeasGlobal.length === 0) {
-                showFeedbackModal('Aviso', 'No hay ideas para exportar.', 'ℹ️');
-                return;
-            }
+        modal.style.display = "flex";
+      }
+      function exportarTexto() {
+        if (!currentIdeasGlobal || currentIdeasGlobal.length === 0) {
+          showFeedbackModal("Aviso", "No hay ideas para exportar.", "ℹ️");
+          return;
+        }
 
-            const container = document.getElementById('resultadosContainer');
-            const target = document.createElement('div');
-            
-            // Create a clean aesthetic container off-screen for the PDF
-            target.style.position = 'absolute';
-            target.style.top = '-9999px';
-            target.style.left = '-9999px';
-            target.style.width = '800px'; 
-            target.style.backgroundColor = '#F0ECE3';
-            target.style.padding = '40px';
-            target.style.fontFamily = "'Inter', sans-serif";
-            target.style.color = '#111827';
-            
-            let contentHTML = `
+        let contenido = "IDEAS GENERADAS - TECHO LAB\n\n";
+        currentIdeasGlobal.forEach((idea, index) => {
+          contenido += `--- IDEA #${index + 1} | ${idea.tipo.toUpperCase()} (${idea.red}) ---\n\n`;
+          contenido += `CONCEPTO:\n${idea.concepto}\n\n`;
+          if (idea.copy && idea.copy.trim() !== "") {
+            contenido += `COPY (TEXTO):\n${idea.copy}\n\n`;
+          }
+          contenido += `VISUAL:\n${idea.visual}\n\n`;
+        });
+
+        const blob = new Blob([contenido], {
+          type: "text/plain;charset=utf-8",
+        });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = "techo_ideas.txt";
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+      }
+
+      async function exportarPDF() {
+        if (!currentIdeasGlobal || currentIdeasGlobal.length === 0) {
+          showFeedbackModal("Aviso", "No hay ideas para exportar.", "ℹ️");
+          return;
+        }
+
+        const container = document.getElementById("resultadosContainer");
+        const target = document.createElement("div");
+
+        // Create a clean aesthetic container off-screen for the PDF
+        target.style.position = "absolute";
+        target.style.top = "-9999px";
+        target.style.left = "-9999px";
+        target.style.width = "800px";
+        target.style.backgroundColor = "#F0ECE3";
+        target.style.padding = "40px";
+        target.style.fontFamily = "'Inter', sans-serif";
+        target.style.color = "#111827";
+
+        let contentHTML = `
                 <div style="border: 3px solid #111827; background: #fff; border-radius: 8px; padding: 30px; box-shadow: 8px 8px 0px 0px #111827; margin-bottom: 30px;">
                     <div style="display: flex; align-items: center; justify-content: space-between; border-bottom: 2px solid #efefef; padding-bottom: 20px; margin-bottom: 20px;">
                         <div>
@@ -1898,109 +2653,125 @@ Reglas hiper estrictas por formato:
                         <img src="https://argentina.techo.org/wp-content/uploads/sites/8/2026/04/Capa_1-1-1.svg" style="height: 40px;">
                     </div>
             `;
-            
-            currentIdeasGlobal.forEach((idea, index) => {
-                contentHTML += `
+
+        currentIdeasGlobal.forEach((idea, index) => {
+          contentHTML += `
                     <div style="margin-bottom: 30px; padding: 20px; background: #f9f9f9; border: 2px solid #111827; border-radius: 8px;">
                         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
-                            <h2 style="font-family: 'Fredoka', sans-serif; font-size: 20px; margin: 0; display: inline-block; background: #FFD100; padding: 4px 10px; border-radius: 4px; border: 2px solid #111827;">#${index+1} - ${idea.tipo.toUpperCase()}</h2>
+                            <h2 style="font-family: 'Fredoka', sans-serif; font-size: 20px; margin: 0; display: inline-block; background: #FFD100; padding: 4px 10px; border-radius: 4px; border: 2px solid #111827;">#${index + 1} - ${idea.tipo.toUpperCase()}</h2>
                             <span style="font-size: 12px; font-weight: bold; background: #0092DD; color: white; padding: 4px 8px; border-radius: 4px;">${idea.red}</span>
                         </div>
                         
                         <h3 style="font-size: 14px; text-transform: uppercase; color: #0092DD; margin: 0 0 5px 0;">Concepto</h3>
-                        <p style="margin: 0 0 15px 0; font-size: 14px;">${idea.concepto.replace(/\\n/g, '<br>')}</p>
+                        <p style="margin: 0 0 15px 0; font-size: 14px;">${idea.concepto.replace(/\\n/g, "<br>")}</p>
                         
-                        ${idea.copy ? `
+                        ${
+                          idea.copy
+                            ? `
                         <h3 style="font-size: 14px; text-transform: uppercase; color: #0092DD; margin: 0 0 5px 0;">Texto / Copy</h3>
-                        <p style="margin: 0 0 15px 0; font-size: 14px; white-space: pre-wrap;">${idea.copy.replace(/\\n/g, '<br>')}</p>
-                        ` : ''}
+                        <p style="margin: 0 0 15px 0; font-size: 14px; white-space: pre-wrap;">${idea.copy.replace(/\\n/g, "<br>")}</p>
+                        `
+                            : ""
+                        }
                         
                         <h3 style="font-size: 14px; text-transform: uppercase; color: #0092DD; margin: 0 0 5px 0;">Visual</h3>
-                        <p style="margin: 0 0 10px 0; font-size: 14px; color: #555;">${idea.visual.replace(/\\n/g, '<br>')}</p>
+                        <p style="margin: 0 0 10px 0; font-size: 14px; color: #555;">${idea.visual.replace(/\\n/g, "<br>")}</p>
                     </div>
                 `;
-            });
-            
-            contentHTML += `
+        });
+
+        contentHTML += `
                 </div>
             `;
-            
-            target.innerHTML = contentHTML;
-            document.body.appendChild(target);
-            
-            try {
-                // Ensure the fonts are loaded
-                await document.fonts.ready;
-                
-                const canvas = await html2canvas(target, {
-                    scale: 2,
-                    useCORS: true,
-                    logging: false,
-                    backgroundColor: '#F0ECE3'
-                });
-                
-                const imgData = canvas.toDataURL('image/png');
-                
-                // Assuming jsPDF is loaded globally
-                const { jsPDF } = window.jspdf;
-                
-                // Calculate PDF dimensions to fit the whole canvas content nicely
-                const pdfWidth = document.body.clientWidth > 800 ? 210 : 210; // A4 width in mm
-                const ratio = canvas.height / canvas.width;
-                const pdfHeight = pdfWidth * ratio; // Proportional height
-                
-                // standard A4 size is 210 x 297mm. If it's taller, we can create a custom page size or multiple pages
-                // Create a single long page PDF instead of splitting, as it's cleaner for digital distribution
-                const pdf = new jsPDF({
-                    orientation: 'portrait',
-                    unit: 'mm',
-                    format: [pdfWidth, pdfHeight]
-                });
-                
-                pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
-                pdf.save('techo_ideas.pdf');
-                
-            } catch (err) {
-                console.error("Error generando PDF:", err);
-                showFeedbackModal('Error', 'Hubo un error al generar el PDF. Asegurate de intentar descargar como Texto.', '⚠️');
-            } finally {
-                document.body.removeChild(target);
-            }
+
+        target.innerHTML = contentHTML;
+        document.body.appendChild(target);
+
+        try {
+          // Ensure the fonts are loaded
+          await document.fonts.ready;
+
+          const canvas = await html2canvas(target, {
+            scale: 2,
+            useCORS: true,
+            logging: false,
+            backgroundColor: "#F0ECE3",
+          });
+
+          const imgData = canvas.toDataURL("image/png");
+
+          // Assuming jsPDF is loaded globally
+          const { jsPDF } = window.jspdf;
+
+          // Calculate PDF dimensions to fit the whole canvas content nicely
+          const pdfWidth = document.body.clientWidth > 800 ? 210 : 210; // A4 width in mm
+          const ratio = canvas.height / canvas.width;
+          const pdfHeight = pdfWidth * ratio; // Proportional height
+
+          // standard A4 size is 210 x 297mm. If it's taller, we can create a custom page size or multiple pages
+          // Create a single long page PDF instead of splitting, as it's cleaner for digital distribution
+          const pdf = new jsPDF({
+            orientation: "portrait",
+            unit: "mm",
+            format: [pdfWidth, pdfHeight],
+          });
+
+          pdf.addImage(imgData, "PNG", 0, 0, pdfWidth, pdfHeight);
+          pdf.save("techo_ideas.pdf");
+        } catch (err) {
+          console.error("Error generando PDF:", err);
+          showFeedbackModal(
+            "Error",
+            "Hubo un error al generar el PDF. Asegurate de intentar descargar como Texto.",
+            "⚠️",
+          );
+        } finally {
+          document.body.removeChild(target);
         }
+      }
 
-        let currentSharedIdeaId = null;
+      let currentSharedIdeaId = null;
 
-        async function initSharedIdea() {
-            const urlParams = new URLSearchParams(window.location.search);
-            const sharedId = urlParams.get('shared');
-            if (sharedId) {
-                document.getElementById('sharedIdeaModal').classList.add('active');
-                currentSharedIdeaId = sharedId;
-                
-                try {
-                    const response = await fetch(`/api/ideas/${sharedId}`);
-                    if (!response.ok) throw new Error('Generación no encontrada');
-                    const data = await response.json();
-                    
-                    const ideas = Array.isArray(data.idea) ? data.idea : [data.idea];
-                    const votes = Array.isArray(data.votes) ? data.votes : Array(ideas.length).fill(data.votes || 0);
-                    
-                    let htmlList = '<p style="color:var(--text-muted); margin-bottom: 1.5rem; text-align: center;">Elige tu idea favorita de esta generación.</p>';
-                    ideas.forEach((idea, index) => {
-                        let badgeClass = 'badge-post';
-                        const tipoLower = idea.tipo.toLowerCase();
-                        if(tipoLower.includes('carrusel')) badgeClass = 'badge-carousel';
-                        if(tipoLower.includes('reel') || tipoLower.includes('tiktok') || tipoLower.includes('short')) badgeClass = 'badge-reel';
-                        if(tipoLower.includes('story') || tipoLower.includes('historia')) badgeClass = 'badge-story';
-                        
-                        htmlList += `
+      async function initSharedIdea() {
+        const urlParams = new URLSearchParams(window.location.search);
+        const sharedId = urlParams.get("shared");
+        if (sharedId) {
+          document.getElementById("sharedIdeaModal").classList.add("active");
+          currentSharedIdeaId = sharedId;
+
+          try {
+            const response = await fetch(`/api/ideas/${sharedId}`);
+            if (!response.ok) throw new Error("Generación no encontrada");
+            const data = await response.json();
+
+            const ideas = Array.isArray(data.idea) ? data.idea : [data.idea];
+            const votes = Array.isArray(data.votes)
+              ? data.votes
+              : Array(ideas.length).fill(data.votes || 0);
+
+            let htmlList =
+              '<p style="color:var(--text-muted); margin-bottom: 1.5rem; text-align: center;">Elige tu idea favorita de esta generación.</p>';
+            ideas.forEach((idea, index) => {
+              let badgeClass = "badge-post";
+              const tipoLower = idea.tipo.toLowerCase();
+              if (tipoLower.includes("carrusel")) badgeClass = "badge-carousel";
+              if (
+                tipoLower.includes("reel") ||
+                tipoLower.includes("tiktok") ||
+                tipoLower.includes("short")
+              )
+                badgeClass = "badge-reel";
+              if (tipoLower.includes("story") || tipoLower.includes("historia"))
+                badgeClass = "badge-story";
+
+              htmlList += `
                             <div style="margin-bottom: 2rem; padding-bottom: 1.5rem; border-bottom: 2px dashed var(--border-color);">
                                 <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:1rem;">
                                     <h3 style="margin:0; font-family:var(--font-headings); font-size:1.2rem; color:var(--techo-blue)">${idea.red}</h3>
                                     <span class="badge ${badgeClass}">${idea.tipo}</span>
                                 </div>
                                 <p style="font-weight:600; margin-bottom:0.75rem;">Concepto: <span style="font-weight:normal;">${idea.concepto}</span></p>
-                                ${idea.copy ? `<p style="font-weight:600; margin-bottom:0.75rem;">Texto / Copy: <span style="font-weight:normal; white-space:pre-wrap;">${idea.copy}</span></p>` : ''}
+                                ${idea.copy ? `<p style="font-weight:600; margin-bottom:0.75rem;">Texto / Copy: <span style="font-weight:normal; white-space:pre-wrap;">${idea.copy}</span></p>` : ""}
                                 <p style="font-weight:600; margin-bottom:1rem;">Visual / Audio: <span style="font-weight:normal;">${idea.visual}</span></p>
                                 <div style="text-align: right;">
                                     <button id="btnVotar-${index}" class="btn btn-outline btn-small" onclick="votarIdea(${index})" style="font-size: 0.9rem; padding: 0.5rem 1rem;">
@@ -2009,133 +2780,188 @@ Reglas hiper estrictas por formato:
                                 </div>
                             </div>
                         `;
-                    });
-
-                    document.getElementById('sharedIdeaBody').innerHTML = htmlList;
-
-                    const votedIndex = localStorage.getItem(`voted_${sharedId}`);
-                    if (votedIndex !== null) {
-                        ideas.forEach((_, index) => {
-                            const btnVotar = document.getElementById(`btnVotar-${index}`);
-                            if (btnVotar) btnVotar.disabled = true;
-                            if (index == votedIndex && btnVotar) {
-                                btnVotar.innerHTML = `✅ Votaste esta idea <span id="votosCount-${index}" class="badge badge-content" style="background:#fff; color:#000; margin-left:8px;">${votes[index]}</span>`;
-                            }
-                        });
-                    }
-                } catch (e) {
-                    document.getElementById('sharedIdeaBody').innerHTML = `<p style="color:var(--error); text-align:center;">${e.message}</p>`;
-                }
-            }
-        }
-
-        function votarIdea(index) {
-            if (!currentSharedIdeaId) return;
-
-            showConfirmModal('Votar Idea', '¿Estás seguro de que deseas votar por esta idea? Solo puedes votar una vez por generación.', async () => {
-                const buttons = document.querySelectorAll('button[id^="btnVotar-"]');
-                buttons.forEach(btn => btn.disabled = true);
-                
-                try {
-                    const response = await fetch(`/api/ideas/${currentSharedIdeaId}/vote/${index}`, { method: 'POST' });
-                    if (response.ok) {
-                        const data = await response.json();
-                        localStorage.setItem(`voted_${currentSharedIdeaId}`, index);
-                        
-                        buttons.forEach((btn, i) => {
-                            if (i === index) {
-                                btn.innerHTML = `✅ Votaste esta idea <span id="votosCount-${i}" class="badge badge-content" style="background:#fff; color:#000; margin-left:8px;">${data.votes[i]}</span>`;
-                            } else {
-                                const badge = document.getElementById(`votosCount-${i}`);
-                                if (badge) badge.innerText = data.votes[i] || 0;
-                            }
-                        });
-                        showFeedbackModal("¡Gracias por tu voto!", "Tu feedback nos ayuda a identificar las mejores ideas de la comunidad.", "🎉");
-                    } else {
-                        throw new Error('Error al votar');
-                    }
-                } catch (e) {
-                    console.error('Error voting:', e);
-                    buttons.forEach(btn => btn.disabled = false);
-                    showFeedbackModal("Error", "No se pudo enviar el voto.", "⚠️");
-                }
             });
-        }
 
-        function closeSharedModal() {
-            document.getElementById('sharedIdeaModal').classList.remove('active');
-            const url = new URL(window.location);
-            url.searchParams.delete('shared');
-            window.history.pushState({}, '', url);
-        }
+            document.getElementById("sharedIdeaBody").innerHTML = htmlList;
 
-        // Modals Management
-        let confirmCallback = null;
-
-        function showConfirmModal(title, message, onConfirm) {
-            document.getElementById('confirmTitle').innerText = title;
-            document.getElementById('confirmMessage').innerText = message;
-            confirmCallback = onConfirm;
-            document.getElementById('confirmModal').classList.add('active');
-        }
-
-        function closeConfirmModal() {
-            document.getElementById('confirmModal').classList.remove('active');
-            confirmCallback = null;
-        }
-
-        function handleConfirmAction() {
-            if (confirmCallback) {
-                confirmCallback();
+            const votedIndex = localStorage.getItem(`voted_${sharedId}`);
+            if (votedIndex !== null) {
+              ideas.forEach((_, index) => {
+                const btnVotar = document.getElementById(`btnVotar-${index}`);
+                if (btnVotar) btnVotar.disabled = true;
+                if (index == votedIndex && btnVotar) {
+                  btnVotar.innerHTML = `✅ Votaste esta idea <span id="votosCount-${index}" class="badge badge-content" style="background:#fff; color:#000; margin-left:8px;">${votes[index]}</span>`;
+                }
+              });
             }
-            closeConfirmModal();
+          } catch (e) {
+            document.getElementById("sharedIdeaBody").innerHTML =
+              `<p style="color:var(--error); text-align:center;">${e.message}</p>`;
+          }
         }
+      }
 
-        function showFeedbackModal(title, message, icon = '🎉') {
-            const d = document.getElementById('feedbackModal');
-            d.querySelector('.modal-content div:first-child').innerText = icon;
-            d.querySelector('h2').innerText = title;
-            d.querySelector('p').innerText = message;
-            d.classList.add('active');
+      function votarIdea(index) {
+        if (!currentSharedIdeaId) return;
+
+        showConfirmModal(
+          "Votar Idea",
+          "¿Estás seguro de que deseas votar por esta idea? Solo puedes votar una vez por generación.",
+          async () => {
+            const buttons = document.querySelectorAll(
+              'button[id^="btnVotar-"]',
+            );
+            buttons.forEach((btn) => (btn.disabled = true));
+
+            try {
+              const response = await fetch(
+                `/api/ideas/${currentSharedIdeaId}/vote/${index}`,
+                { method: "POST" },
+              );
+              if (response.ok) {
+                const data = await response.json();
+                localStorage.setItem(`voted_${currentSharedIdeaId}`, index);
+
+                buttons.forEach((btn, i) => {
+                  if (i === index) {
+                    btn.innerHTML = `✅ Votaste esta idea <span id="votosCount-${i}" class="badge badge-content" style="background:#fff; color:#000; margin-left:8px;">${data.votes[i]}</span>`;
+                  } else {
+                    const badge = document.getElementById(`votosCount-${i}`);
+                    if (badge) badge.innerText = data.votes[i] || 0;
+                  }
+                });
+                showFeedbackModal(
+                  "¡Gracias por tu voto!",
+                  "Tu feedback nos ayuda a identificar las mejores ideas de la comunidad.",
+                  "🎉",
+                );
+              } else {
+                throw new Error("Error al votar");
+              }
+            } catch (e) {
+              console.error("Error voting:", e);
+              buttons.forEach((btn) => (btn.disabled = false));
+              showFeedbackModal("Error", "No se pudo enviar el voto.", "⚠️");
+            }
+          },
+        );
+      }
+
+      function closeSharedModal() {
+        document.getElementById("sharedIdeaModal").classList.remove("active");
+        const url = new URL(window.location);
+        url.searchParams.delete("shared");
+        window.history.pushState({}, "", url);
+      }
+
+      // Modals Management
+      let confirmCallback = null;
+
+      function showConfirmModal(title, message, onConfirm) {
+        document.getElementById("confirmTitle").innerText = title;
+        document.getElementById("confirmMessage").innerText = message;
+        confirmCallback = onConfirm;
+        document.getElementById("confirmModal").classList.add("active");
+      }
+
+      function closeConfirmModal() {
+        document.getElementById("confirmModal").classList.remove("active");
+        confirmCallback = null;
+      }
+
+      function handleConfirmAction() {
+        if (confirmCallback) {
+          confirmCallback();
         }
+        closeConfirmModal();
+      }
 
-        function closeFeedbackModal() {
-            document.getElementById('feedbackModal').classList.remove('active');
-        }
+      function showFeedbackModal(title, message, icon = "🎉") {
+        const d = document.getElementById("feedbackModal");
+        d.querySelector(".modal-content div:first-child").innerText = icon;
+        d.querySelector("h2").innerText = title;
+        d.querySelector("p").innerText = message;
+        d.classList.add("active");
+      }
 
-        // Initialize Theme and Shared on Load
-        initTheme();
-        initSharedIdea();
+      function closeFeedbackModal() {
+        document.getElementById("feedbackModal").classList.remove("active");
+      }
+
+      // Initialize Theme and Shared on Load
+      initTheme();
+      initSharedIdea();
     </script>
-    
+
     <!-- Mockup Modal -->
-    <div id="mockupModal" class="modal-overlay" onclick="if(event.target === this) this.style.display='none'">
-        <div class="mockup-container anim-slide-up" id="mockupDynamicContainer" onclick="event.stopPropagation()">
-            <!-- Dynamic content inserted by JS depending on type -->
-        </div>
+    <div
+      id="mockupModal"
+      class="modal-overlay"
+      onclick="if (event.target === this) this.style.display = 'none';"
+    >
+      <div
+        class="mockup-container anim-slide-up"
+        id="mockupDynamicContainer"
+        onclick="event.stopPropagation()"
+      >
+        <!-- Dynamic content inserted by JS depending on type -->
+      </div>
     </div>
     <!-- Modal Confirmación -->
     <div id="confirmModal" class="modal-overlay">
-        <div class="modal-content" style="max-width: 400px; text-align: center; padding: 2rem;">
-            <div style="font-size: 2rem; margin-bottom: 1rem;" id="confirmIcon">⚠️</div>
-            <h2 id="confirmTitle" style="margin-bottom: 1rem;">Confirmación</h2>
-            <p id="confirmMessage" style="color: var(--text-muted); margin-bottom: 2rem;">¿Estás seguro de que deseas realizar esta acción?</p>
-            <div style="display: flex; gap: 1rem; justify-content: center;">
-                <button class="btn btn-outline" onclick="closeConfirmModal()" style="flex: 1;">Cancelar</button>
-                <button class="btn btn-primary" id="confirmActionBtn" onclick="handleConfirmAction()" style="flex: 1;">Confirmar</button>
-            </div>
+      <div
+        class="modal-content"
+        style="max-width: 400px; text-align: center; padding: 2rem"
+      >
+        <div style="font-size: 2rem; margin-bottom: 1rem" id="confirmIcon">
+          ⚠️
         </div>
+        <h2 id="confirmTitle" style="margin-bottom: 1rem">Confirmación</h2>
+        <p
+          id="confirmMessage"
+          style="color: var(--text-muted); margin-bottom: 2rem"
+        >
+          ¿Estás seguro de que deseas realizar esta acción?
+        </p>
+        <div style="display: flex; gap: 1rem; justify-content: center">
+          <button
+            class="btn btn-outline"
+            onclick="closeConfirmModal()"
+            style="flex: 1"
+          >
+            Cancelar
+          </button>
+          <button
+            class="btn btn-primary"
+            id="confirmActionBtn"
+            onclick="handleConfirmAction()"
+            style="flex: 1"
+          >
+            Confirmar
+          </button>
+        </div>
+      </div>
     </div>
 
     <!-- Modal Votación Exitosa (Feedback) -->
     <div id="feedbackModal" class="modal-overlay">
-        <div class="modal-content" style="max-width: 400px; text-align: center; padding: 2rem;">
-            <div style="font-size: 3rem; margin-bottom: 1rem;">🎉</div>
-            <h2 style="margin-bottom: 1rem;">¡Gracias por tu voto!</h2>
-            <p style="color: var(--text-muted); margin-bottom: 2rem;">Tu feedback nos ayuda a identificar las mejores ideas de la comunidad.</p>
-            <button class="btn btn-primary" onclick="closeFeedbackModal()" style="width: 100%;">Cerrar</button>
-        </div>
+      <div
+        class="modal-content"
+        style="max-width: 400px; text-align: center; padding: 2rem"
+      >
+        <div style="font-size: 3rem; margin-bottom: 1rem">🎉</div>
+        <h2 style="margin-bottom: 1rem">¡Gracias por tu voto!</h2>
+        <p style="color: var(--text-muted); margin-bottom: 2rem">
+          Tu feedback nos ayuda a identificar las mejores ideas de la comunidad.
+        </p>
+        <button
+          class="btn btn-primary"
+          onclick="closeFeedbackModal()"
+          style="width: 100%"
+        >
+          Cerrar
+        </button>
+      </div>
     </div>
-
-</body>
+  </body>
 </html>
