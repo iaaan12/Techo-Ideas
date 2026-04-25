@@ -1,0 +1,17 @@
+{
+  "ideas": {
+    "282f9a95-54a1-4282-875e-350d53a4de17": {
+      "idea": [
+        {
+          "concepto": "test",
+          "visual": "foo",
+          "tipo": "FOO"
+        }
+      ],
+      "votes": [
+        1
+      ],
+      "createdAt": 1777120468425
+    }
+  }
+}

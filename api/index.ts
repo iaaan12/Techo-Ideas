@@ -1,27 +1,27 @@
 import express from 'express';
 import crypto from 'crypto';
-import fs from 'fs/promises';
+import { createClient } from 'redis';
 
 const app = express();
 
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ limit: '10mb', extended: true }));
 
-const DATA_FILE = '/tmp/database.json';
+// Redis Client Setup
+const redis = createClient({
+  url: process.env.KV_URL || process.env.REDIS_URL
+});
 
-async function ensureDb() {
-  try {
-    await fs.access(DATA_FILE);
-  } catch (e) {
-    try {
-      await fs.writeFile(DATA_FILE, JSON.stringify({ ideas: {} }));
-    } catch (err: any) {
-      console.warn("DB init warning:", err.message);
-    }
+redis.on('error', err => console.error('Redis Client Error', err));
+
+async function getRedis() {
+  if (!redis.isOpen) {
+    await redis.connect();
   }
+  return redis;
 }
 
-app.get('/api/ping', (req, res) => res.json({ ok: true, version: 2 }));
+app.get('/api/ping', (req, res) => res.json({ ok: true, storage: 'redis' }));
 
 app.post('/api/proxy', async (req, res) => {
   try {
@@ -58,20 +58,20 @@ app.post('/api/proxy', async (req, res) => {
 
 app.post("/api/ideas/share", async (req, res) => {
   try {
-    await ensureDb();
+    const client = await getRedis();
     const { idea } = req.body;
     const id = crypto.randomUUID();
-    const rawData = await fs.readFile(DATA_FILE, 'utf-8');
-    const db = JSON.parse(rawData);
+    
+    res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
     
     const ideasArray = Array.isArray(idea) ? idea : [idea];
-    db.ideas[id] = {
+    const newEntry = {
       idea: ideasArray,
       votes: ideasArray.map(() => 0),
       createdAt: Date.now()
     };
     
-    await fs.writeFile(DATA_FILE, JSON.stringify(db, null, 2));
+    await client.set(`idea:${id}`, JSON.stringify(newEntry));
     res.json({ id });
   } catch (e: any) {
     res.status(500).json({ error: e.message });
@@ -80,13 +80,15 @@ app.post("/api/ideas/share", async (req, res) => {
 
 app.get("/api/ideas/:id", async (req, res) => {
   try {
-    await ensureDb();
+    const client = await getRedis();
     const id = req.params.id;
-    const rawData = await fs.readFile(DATA_FILE, 'utf-8');
-    const db = JSON.parse(rawData);
+    const dataString = await client.get(`idea:${id}`);
     
-    if (db.ideas[id]) {
-      res.json(db.ideas[id]);
+    res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
+    
+    if (dataString) {
+      const data = JSON.parse(dataString);
+      res.json(data);
     } else {
       res.status(404).json({ error: 'Idea not found' });
     }
@@ -97,22 +99,26 @@ app.get("/api/ideas/:id", async (req, res) => {
 
 app.post("/api/ideas/:id/vote/:ideaIndex", async (req, res) => {
   try {
-    await ensureDb();
+    const client = await getRedis();
     const { id, ideaIndex } = req.params;
     const idx = parseInt(ideaIndex, 10);
-    const rawData = await fs.readFile(DATA_FILE, 'utf-8');
-    const db = JSON.parse(rawData);
     
-    if (db.ideas[id]) {
-      if (!Array.isArray(db.ideas[id].votes)) {
-          const ideasArray = Array.isArray(db.ideas[id].idea) ? db.ideas[id].idea : [db.ideas[id].idea];
-          db.ideas[id].votes = ideasArray.map(() => 0);
+    res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
+    
+    const dataString = await client.get(`idea:${id}`);
+    
+    if (dataString) {
+      const data = JSON.parse(dataString);
+      
+      if (!Array.isArray(data.votes)) {
+          const ideasArray = Array.isArray(data.idea) ? data.idea : [data.idea];
+          data.votes = ideasArray.map(() => 0);
       }
       
-      if (db.ideas[id].votes[idx] !== undefined) {
-           db.ideas[id].votes[idx] += 1;
-           await fs.writeFile(DATA_FILE, JSON.stringify(db, null, 2));
-           res.json({ votes: db.ideas[id].votes });
+      if (data.votes[idx] !== undefined) {
+           data.votes[idx] += 1;
+           await client.set(`idea:${id}`, JSON.stringify(data));
+           res.json({ votes: data.votes });
       } else {
            res.status(404).json({ error: 'Idea index not found' });
       }
