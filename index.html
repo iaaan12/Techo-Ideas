@@ -1274,13 +1274,13 @@
         async function generarIdeas() {
             if (!config.apiKey) {
                 openConfigModal();
-                alert('Por favor, ingresá tu API Key primero.');
+                showFeedbackModal('API Key Requerida', 'Por favor, ingresá tu API Key.', '🔑');
                 return;
             }
 
             const tiposSeleccionados = Array.from(document.querySelectorAll('input[name="tipoContenido"]:checked')).map(cb => cb.value);
             if(tiposSeleccionados.length === 0) {
-                alert('Seleccioná al menos un tipo de contenido.');
+                showFeedbackModal('Faltan Datos', 'Seleccioná al menos un tipo de contenido.', 'ℹ️');
                 return;
             }
 
@@ -1642,7 +1642,7 @@ Reglas hiper estrictas por formato:
         
         async function compartirGeneracion() {
             if (!currentIdeasGlobal || currentIdeasGlobal.length === 0) {
-                alert('No hay ideas para compartir.');
+                showFeedbackModal('Aviso', 'No hay ideas para compartir.', 'ℹ️');
                 return;
             }
             
@@ -1659,16 +1659,16 @@ Reglas hiper estrictas por formato:
                     
                     try {
                         await navigator.clipboard.writeText(shareUrl);
-                        alert('¡Enlace copiado al portapapeles! Compartilo para que otros voten tus ideas.');
+                        showFeedbackModal('¡Enlace copiado!', 'Compartilo para que otros voten tus ideas.', '🔗');
                     } catch (err) {
-                        alert(`Enlace para compartir: \n${shareUrl}`);
+                        showFeedbackModal('Enlace Generado', shareUrl, '🔗');
                     }
                 } else {
-                    alert('Hubo un error al generar el enlace de compartir.');
+                    showFeedbackModal('Error', 'Hubo un error al generar el enlace de compartir.', '⚠️');
                 }
             } catch (err) {
                 console.error('Error sharing:', err);
-                alert('No se pudo conectar al servidor para compartir.');
+                showFeedbackModal('Error', 'No se pudo conectar al servidor para compartir.', '⚠️');
             }
         }
 
@@ -1679,13 +1679,13 @@ Reglas hiper estrictas por formato:
             const ideaStr = JSON.stringify(idea);
             
             if (favoritos.some(f => JSON.stringify(f.idea) === ideaStr)) {
-                alert('Esta idea ya está en Favoritos.');
+                showFeedbackModal('Aviso', 'Esta idea ya está en Favoritos.', '⭐');
                 return;
             }
             
             favoritos.unshift({ idea: idea, fecha: Date.now() });
             localStorage.setItem('techo_favoritos', JSON.stringify(favoritos));
-            alert('¡Idea guardada en Favoritos!');
+            showFeedbackModal('¡Guardada!', 'La idea ha sido guardada en tus favoritos.', '⭐');
             if (document.getElementById('tabFavoritos').classList.contains('active')) {
                 renderFavoritos();
             }
@@ -1694,9 +1694,11 @@ Reglas hiper estrictas por formato:
         function eliminarFavorito(event, index) {
             event.preventDefault();
             event.stopPropagation();
-            favoritos.splice(index, 1);
-            localStorage.setItem('techo_favoritos', JSON.stringify(favoritos));
-            renderFavoritos();
+            showConfirmModal('Eliminar de Favoritos', '¿Estás seguro de que deseas eliminar esta idea de tus favoritos?', () => {
+                favoritos.splice(index, 1);
+                localStorage.setItem('techo_favoritos', JSON.stringify(favoritos));
+                renderFavoritos();
+            });
         }
 
         function renderFavoritos() {
@@ -1842,7 +1844,7 @@ Reglas hiper estrictas por formato:
         }
         function exportarTexto() {
             if (!currentIdeasGlobal || currentIdeasGlobal.length === 0) {
-                alert('No hay ideas para exportar.');
+                showFeedbackModal('Aviso', 'No hay ideas para exportar.', 'ℹ️');
                 return;
             }
             
@@ -1869,7 +1871,7 @@ Reglas hiper estrictas por formato:
 
         async function exportarPDF() {
             if (!currentIdeasGlobal || currentIdeasGlobal.length === 0) {
-                alert('No hay ideas para exportar.');
+                showFeedbackModal('Aviso', 'No hay ideas para exportar.', 'ℹ️');
                 return;
             }
 
@@ -1960,7 +1962,7 @@ Reglas hiper estrictas por formato:
                 
             } catch (err) {
                 console.error("Error generando PDF:", err);
-                alert("Hubo un error al generar el PDF. Asegurate de intentar descargar como Texto.");
+                showFeedbackModal('Error', 'Hubo un error al generar el PDF. Asegurate de intentar descargar como Texto.', '⚠️');
             } finally {
                 document.body.removeChild(target);
             }
@@ -2027,34 +2029,37 @@ Reglas hiper estrictas por formato:
             }
         }
 
-        async function votarIdea(index) {
+        function votarIdea(index) {
             if (!currentSharedIdeaId) return;
-            
-            const buttons = document.querySelectorAll('button[id^="btnVotar-"]');
-            buttons.forEach(btn => btn.disabled = true);
-            
-            try {
-                const response = await fetch(`/api/ideas/${currentSharedIdeaId}/vote/${index}`, { method: 'POST' });
-                if (response.ok) {
-                    const data = await response.json();
-                    localStorage.setItem(`voted_${currentSharedIdeaId}`, index);
-                    
-                    buttons.forEach((btn, i) => {
-                        if (i === index) {
-                            btn.innerHTML = `✅ Votaste esta idea <span id="votosCount-${i}" class="badge badge-content" style="background:#fff; color:#000; margin-left:8px;">${data.votes[i]}</span>`;
-                        } else {
-                            const badge = document.getElementById(`votosCount-${i}`);
-                            if (badge) badge.innerText = data.votes[i] || 0;
-                        }
-                    });
-                } else {
-                    throw new Error('Error al votar');
+
+            showConfirmModal('Votar Idea', '¿Estás seguro de que deseas votar por esta idea? Solo puedes votar una vez por generación.', async () => {
+                const buttons = document.querySelectorAll('button[id^="btnVotar-"]');
+                buttons.forEach(btn => btn.disabled = true);
+                
+                try {
+                    const response = await fetch(`/api/ideas/${currentSharedIdeaId}/vote/${index}`, { method: 'POST' });
+                    if (response.ok) {
+                        const data = await response.json();
+                        localStorage.setItem(`voted_${currentSharedIdeaId}`, index);
+                        
+                        buttons.forEach((btn, i) => {
+                            if (i === index) {
+                                btn.innerHTML = `✅ Votaste esta idea <span id="votosCount-${i}" class="badge badge-content" style="background:#fff; color:#000; margin-left:8px;">${data.votes[i]}</span>`;
+                            } else {
+                                const badge = document.getElementById(`votosCount-${i}`);
+                                if (badge) badge.innerText = data.votes[i] || 0;
+                            }
+                        });
+                        showFeedbackModal("¡Gracias por tu voto!", "Tu feedback nos ayuda a identificar las mejores ideas de la comunidad.", "🎉");
+                    } else {
+                        throw new Error('Error al votar');
+                    }
+                } catch (e) {
+                    console.error('Error voting:', e);
+                    buttons.forEach(btn => btn.disabled = false);
+                    showFeedbackModal("Error", "No se pudo enviar el voto.", "⚠️");
                 }
-            } catch (e) {
-                console.error('Error voting:', e);
-                buttons.forEach(btn => btn.disabled = false);
-                alert('No se pudo enviar el voto.');
-            }
+            });
         }
 
         function closeSharedModal() {
@@ -2062,6 +2067,40 @@ Reglas hiper estrictas por formato:
             const url = new URL(window.location);
             url.searchParams.delete('shared');
             window.history.pushState({}, '', url);
+        }
+
+        // Modals Management
+        let confirmCallback = null;
+
+        function showConfirmModal(title, message, onConfirm) {
+            document.getElementById('confirmTitle').innerText = title;
+            document.getElementById('confirmMessage').innerText = message;
+            confirmCallback = onConfirm;
+            document.getElementById('confirmModal').classList.add('active');
+        }
+
+        function closeConfirmModal() {
+            document.getElementById('confirmModal').classList.remove('active');
+            confirmCallback = null;
+        }
+
+        function handleConfirmAction() {
+            if (confirmCallback) {
+                confirmCallback();
+            }
+            closeConfirmModal();
+        }
+
+        function showFeedbackModal(title, message, icon = '🎉') {
+            const d = document.getElementById('feedbackModal');
+            d.querySelector('.modal-content div:first-child').innerText = icon;
+            d.querySelector('h2').innerText = title;
+            d.querySelector('p').innerText = message;
+            d.classList.add('active');
+        }
+
+        function closeFeedbackModal() {
+            document.getElementById('feedbackModal').classList.remove('active');
         }
 
         // Initialize Theme and Shared on Load
@@ -2075,5 +2114,28 @@ Reglas hiper estrictas por formato:
             <!-- Dynamic content inserted by JS depending on type -->
         </div>
     </div>
+    <!-- Modal Confirmación -->
+    <div id="confirmModal" class="modal-overlay">
+        <div class="modal-content" style="max-width: 400px; text-align: center; padding: 2rem;">
+            <div style="font-size: 2rem; margin-bottom: 1rem;" id="confirmIcon">⚠️</div>
+            <h2 id="confirmTitle" style="margin-bottom: 1rem;">Confirmación</h2>
+            <p id="confirmMessage" style="color: var(--text-muted); margin-bottom: 2rem;">¿Estás seguro de que deseas realizar esta acción?</p>
+            <div style="display: flex; gap: 1rem; justify-content: center;">
+                <button class="btn btn-outline" onclick="closeConfirmModal()" style="flex: 1;">Cancelar</button>
+                <button class="btn btn-primary" id="confirmActionBtn" onclick="handleConfirmAction()" style="flex: 1;">Confirmar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Votación Exitosa (Feedback) -->
+    <div id="feedbackModal" class="modal-overlay">
+        <div class="modal-content" style="max-width: 400px; text-align: center; padding: 2rem;">
+            <div style="font-size: 3rem; margin-bottom: 1rem;">🎉</div>
+            <h2 style="margin-bottom: 1rem;">¡Gracias por tu voto!</h2>
+            <p style="color: var(--text-muted); margin-bottom: 2rem;">Tu feedback nos ayuda a identificar las mejores ideas de la comunidad.</p>
+            <button class="btn btn-primary" onclick="closeFeedbackModal()" style="width: 100%;">Cerrar</button>
+        </div>
+    </div>
+
 </body>
 </html>
