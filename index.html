@@ -1703,14 +1703,6 @@
         localStorage.setItem("techo_theme", theme);
       }
 
-      const apiKeys = [
-        "%%NVIDIA_API_KEY_1%%",
-        "%%NVIDIA_API_KEY_2%%",
-        "%%NVIDIA_API_KEY_3%%",
-        "%%NVIDIA_API_KEY_4%%"
-      ];
-      const randomKey = apiKeys[Math.floor(Math.random() * apiKeys.length)];
-
       let config = JSON.parse(localStorage.getItem("techo_config")) || {
         provider: "nvidia",
         baseUrl: "https://integrate.api.nvidia.com/v1",
@@ -1778,13 +1770,9 @@
 
       function updateApiStatus() {
         const badge = document.getElementById("apiStatus");
-        if (config.apiKey && config.apiKey.trim() !== "") {
-          badge.className = "api-badge connected";
-          badge.innerHTML = "✓ API conectada";
-        } else {
-          badge.className = "api-badge missing";
-          badge.innerHTML = "⚠ Sin API Key";
-        }
+        // We now use internal rotation for empty keys
+        badge.className = "api-badge connected";
+        badge.innerHTML = "✓ API conectada (Rotación automática)";
       }
 
       // --- UI Navigation ---
@@ -1980,16 +1968,6 @@
 
       // --- Generación de Contenido ---
       async function generarIdeas() {
-        if (!config.apiKey) {
-          openConfigModal();
-          showFeedbackModal(
-            "API Key Requerida",
-            "Por favor, ingresá tu API Key.",
-            "🔑",
-          );
-          return;
-        }
-
         const tiposSeleccionados = Array.from(
           document.querySelectorAll('input[name="tipoContenido"]:checked'),
         ).map((cb) => cb.value);
@@ -2180,6 +2158,8 @@ Reglas hiper estrictas por formato:
             requestBody.response_format = { type: "json_object" };
           }
 
+          requestBody.stream = true;
+
           const response = await fetch(`/api/proxy`, {
             method: "POST",
             headers: {
@@ -2198,33 +2178,55 @@ Reglas hiper estrictas por formato:
           });
 
           if (!response.ok) {
-            const errObj = await response.json().catch(() => ({}));
-            const msg =
-              errObj.error?.message || errObj.message || JSON.stringify(errObj);
-            throw new Error(
-              msg !== "{}"
-                ? msg
-                : `Error de conexión HTTP ${response.status}. Verificá API Key y URL.`,
-            );
+            const errorText = await response.text();
+            throw new Error(`Error HTTP ${response.status}: ${errorText}`);
           }
 
-          const data = await response.json();
-
-          if (data.error) {
-            const msg = data.error.message || JSON.stringify(data.error);
-            throw new Error(`Error de la API: ${msg}`);
+          clearInterval(loadingInterval);
+          if (thematicTextEl) {
+             thematicTextEl.innerHTML = "Iniciando stream de datos...";
           }
 
-          if (!data.choices || !data.choices[0] || !data.choices[0].message) {
-            console.error("Respuesta inesperada de la API:", data);
-            throw new Error(
-              `La API no devolvió el formato esperado. Revisá la configuración o consultá la consola para más detalles. Respuesta: ${JSON.stringify(data).substring(0, 100)}...`,
-            );
+          const reader = response.body.getReader();
+          const decoder = new TextDecoder();
+          let contentText = "";
+          let reasoningText = "";
+          let buffer = "";
+
+          while (true) {
+            const { value, done } = await reader.read();
+            if (done) break;
+            buffer += decoder.decode(value, { stream: true });
+            const lines = buffer.split('\n');
+            buffer = lines.pop() || "";
+            for (const line of lines) {
+              const trimmed = line.trim();
+              if (trimmed.startsWith('data: ') && trimmed !== 'data: [DONE]') {
+                try {
+                  const dataObj = JSON.parse(trimmed.slice(6));
+                  const delta = dataObj.choices[0]?.delta || {};
+                  if (delta.reasoning || delta.reasoning_content) {
+                    reasoningText += (delta.reasoning || delta.reasoning_content);
+                    if (thematicTextEl && reasoningText.length > 0) {
+                      thematicTextEl.innerHTML = `<span style="opacity:0.8; font-size: 0.9em; line-height: 1.4; display:block; max-height: 200px; overflow-y: auto; text-align: left; background: rgba(0,0,0,0.05); padding: 10px; border-radius: 8px;" id="reasoningBox">${reasoningText.replace(/\n/g, '<br>')}</span>`;
+                      const box = document.getElementById("reasoningBox");
+                      if (box) box.scrollTop = box.scrollHeight;
+                    }
+                  }
+                  if (delta.content) {
+                    contentText += delta.content;
+                    if (thematicTextEl && !reasoningText) {
+                       thematicTextEl.innerHTML = "Generando respuesta final...";
+                    }
+                  }
+                } catch (e) {
+                  // ignore partial JSON parse errors for single lines just in case
+                }
+              }
+            }
           }
 
-          let contentText = data.choices[0].message.content;
-
-          // Stripping <think> blocks
+          // Stripping <think> blocks just in case they arrived in content
           contentText = contentText.replace(/<think>[\s\S]*?<\/think>/g, "");
 
           // Extracting JSON
