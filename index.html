@@ -1096,6 +1096,43 @@
           </div>
         </h1>
         <div class="header-actions">
+          <div style="position: relative;">
+            <button
+              class="btn btn-outline"
+              onclick="toggleNotificationsModal()"
+              style="
+                padding: 0.5rem;
+                width: 36px;
+                height: 36px;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                position: relative;
+              "
+              aria-label="Notificaciones"
+              title="Notificaciones"
+            >
+              🔔
+              <span
+                id="notifBadge"
+                style="
+                  display: none;
+                  position: absolute;
+                  top: -5px;
+                  right: -5px;
+                  background: var(--error);
+                  color: white;
+                  border-radius: 50%;
+                  width: 18px;
+                  height: 18px;
+                  font-size: 0.7rem;
+                  font-weight: bold;
+                  justify-content: center;
+                  align-items: center;
+                "
+              ></span>
+            </button>
+          </div>
           <button
             class="btn btn-outline"
             onclick="toggleTheme()"
@@ -1445,6 +1482,24 @@
       </main>
     </div>
 
+    <!-- Modal Notificaciones -->
+    <div id="notificationsModal" class="modal-overlay">
+      <div
+        class="modal-content"
+        style="max-width: 400px; max-height: 80vh; overflow-y: auto"
+      >
+        <div class="modal-header">
+          <h2>🔔 Notificaciones</h2>
+          <button class="close-btn" onclick="closeNotificationsModal()">×</button>
+        </div>
+        <div class="modal-body" id="notificationsBody" style="text-align: left;">
+          <div style="text-align: center; color: var(--text-muted); padding: 1rem;">
+            No tienes notificaciones
+          </div>
+        </div>
+      </div>
+    </div>
+
     <!-- Modal Compartir/Votar -->
     <div id="sharedIdeaModal" class="modal-overlay">
       <div
@@ -1674,6 +1729,100 @@
       let currentMode = "libre"; // 'libre' o 'tema'
       let history = JSON.parse(localStorage.getItem("techo_history")) || [];
       let favoritos = JSON.parse(localStorage.getItem("techo_favoritos")) || [];
+      let authorId = localStorage.getItem("techo_authorId");
+      if (!authorId) {
+         try {
+           authorId = crypto.randomUUID();
+         } catch(e) {
+           authorId = 'id-' + Date.now() + '-' + Math.random().toString(36).substr(2, 9);
+         }
+         localStorage.setItem("techo_authorId", authorId);
+      }
+
+      // --- Notificaciones ---
+      let notifications = [];
+      let sseConnection = null;
+
+      function initNotifications() {
+         fetch(`/api/notifications?authorId=${authorId}`)
+           .then(res => res.json())
+           .then(data => {
+             notifications = data;
+             updateNotificationsUI();
+           })
+           .catch(e => console.error("Error loading notifications:", e));
+
+         sseConnection = new EventSource(`/api/notifications/stream?authorId=${authorId}`);
+         sseConnection.onmessage = (event) => {
+           try {
+             const notif = JSON.parse(event.data);
+             notifications.push(notif);
+             updateNotificationsUI();
+             playPopSound();
+           } catch(e) {}
+         };
+      }
+
+      function updateNotificationsUI() {
+         const unreadCount = notifications.filter(n => !n.read).length;
+         const badge = document.getElementById("notifBadge");
+         if (badge) {
+            if (unreadCount > 0) {
+               badge.style.display = "flex";
+               badge.innerText = unreadCount > 9 ? "9+" : unreadCount;
+            } else {
+               badge.style.display = "none";
+            }
+         }
+
+         const body = document.getElementById("notificationsBody");
+         if (body) {
+            if (notifications.length === 0) {
+              body.innerHTML = `<div style="text-align: center; color: var(--text-muted); padding: 1rem;">No tienes notificaciones</div>`;
+            } else {
+              body.innerHTML = notifications.slice().reverse().map(n => `
+                <div style="padding: 1rem; border-bottom: 1px solid #efefef; background: ${n.read ? '#fff' : '#f0fafe'}; cursor: pointer;" onclick="viewSharedIdea('${n.ideaId}')">
+                  <div style="font-size: 0.9rem; color: #111;">${n.message}</div>
+                  <div style="font-size: 0.75rem; color: var(--text-muted); margin-top: 4px;">
+                     ${new Date(n.timestamp).toLocaleString()}
+                  </div>
+                </div>
+              `).join('');
+            }
+         }
+      }
+
+      function viewSharedIdea(id) {
+         closeNotificationsModal();
+         const url = new URL(window.location);
+         url.searchParams.set("shared", id);
+         window.history.pushState({}, "", url);
+         initSharedIdea();
+      }
+
+      function toggleNotificationsModal() {
+         const modal = document.getElementById("notificationsModal");
+         if (modal.classList.contains("active")) {
+            closeNotificationsModal();
+         } else {
+            modal.classList.add("active");
+            // Marcar como leidas
+            const unreadCount = notifications.filter(n => !n.read).length;
+            if (unreadCount > 0) {
+               notifications.forEach(n => n.read = true);
+               updateNotificationsUI();
+               fetch('/api/notifications/read', {
+                  method: 'POST',
+                  headers: { 'Content-Type': 'application/json' },
+                  body: JSON.stringify({ authorId })
+               });
+            }
+         }
+      }
+
+      function closeNotificationsModal() {
+         document.getElementById("notificationsModal").classList.remove("active");
+      }
 
       let theme = localStorage.getItem("techo_theme") || "light";
       function initTheme() {
@@ -1766,6 +1915,7 @@
         updateApiStatus();
         renderHistory();
         setupTagInputs();
+        initNotifications();
       };
 
       function updateApiStatus() {
@@ -2490,7 +2640,7 @@ Reglas hiper estrictas por formato:
           const response = await fetch("/api/ideas/share", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ idea: currentIdeasGlobal }),
+            body: JSON.stringify({ idea: currentIdeasGlobal, authorId: authorId }),
           });
 
           if (response.ok) {

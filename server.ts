@@ -8,13 +8,29 @@ const PORT = process.env.PORT || 3000;
 const isVercel = process.env.VERCEL === '1';
 const DATA_FILE = isVercel ? '/tmp/database.json' : path.join(process.cwd(), 'database.json');
 
+// Store SSE clients
+const sseClients = new Map<string, any[]>();
+
 // Ensure DB file exists lazily before use
 async function ensureDb() {
   try {
-    await fs.access(DATA_FILE);
+    const raw = await fs.readFile(DATA_FILE, 'utf-8');
+    const db = JSON.parse(raw);
+    let modified = false;
+    if (!db.ideas) {
+      db.ideas = {};
+      modified = true;
+    }
+    if (!db.notifications) {
+      db.notifications = {};
+      modified = true;
+    }
+    if (modified) {
+      await fs.writeFile(DATA_FILE, JSON.stringify(db, null, 2));
+    }
   } catch (e) {
     try {
-      await fs.writeFile(DATA_FILE, JSON.stringify({ ideas: {} }));
+      await fs.writeFile(DATA_FILE, JSON.stringify({ ideas: {}, notifications: {} }, null, 2));
     } catch (err: any) {
       console.warn("No default write access for DB, may be running in read-only mode:", err.message);
     }
@@ -97,11 +113,64 @@ app.post("/api/proxy", async (req, res) => {
   }
 });
 
+// --- Notifications API ---
+app.get("/api/notifications/stream", (req, res) => {
+  const authorId = req.query.authorId as string;
+  if (!authorId) return res.status(400).send("authorId missing");
+
+  res.setHeader("Content-Type", "text/event-stream");
+  res.setHeader("Cache-Control", "no-cache");
+  res.setHeader("Connection", "keep-alive");
+  res.flushHeaders();
+
+  if (!sseClients.has(authorId)) {
+    sseClients.set(authorId, []);
+  }
+  sseClients.get(authorId)!.push(res);
+
+  req.on("close", () => {
+    if (sseClients.has(authorId)) {
+      const clients = sseClients.get(authorId)!;
+      sseClients.set(authorId, clients.filter(c => c !== res));
+    }
+  });
+});
+
+app.get("/api/notifications", async (req, res) => {
+  try {
+    await ensureDb();
+    const authorId = req.query.authorId as string;
+    if (!authorId) return res.json([]);
+    const rawData = await fs.readFile(DATA_FILE, 'utf-8');
+    const db = JSON.parse(rawData);
+    res.json(db.notifications?.[authorId] || []);
+  } catch (e) {
+    res.json([]);
+  }
+});
+
+app.post("/api/notifications/read", async (req, res) => {
+  try {
+    await ensureDb();
+    const { authorId } = req.body;
+    if (!authorId) return res.json({ ok: false });
+    const rawData = await fs.readFile(DATA_FILE, 'utf-8');
+    const db = JSON.parse(rawData);
+    if (db.notifications?.[authorId]) {
+      db.notifications[authorId].forEach((n: any) => n.read = true);
+      await fs.writeFile(DATA_FILE, JSON.stringify(db, null, 2));
+    }
+    res.json({ ok: true });
+  } catch (e) {
+    res.json({ ok: false });
+  }
+});
+
 // --- Ideas Sharing API ---
 app.post("/api/ideas/share", async (req, res) => {
   try {
     await ensureDb();
-    const { idea } = req.body;
+    const { idea, authorId } = req.body;
     const id = crypto.randomUUID();
     const rawData = await fs.readFile(DATA_FILE, 'utf-8');
     const db = JSON.parse(rawData);
@@ -110,7 +179,8 @@ app.post("/api/ideas/share", async (req, res) => {
     db.ideas[id] = {
       idea: ideasArray,
       votes: ideasArray.map(() => 0),
-      createdAt: Date.now()
+      createdAt: Date.now(),
+      authorId: authorId || null
     };
     
     await fs.writeFile(DATA_FILE, JSON.stringify(db, null, 2));
@@ -154,6 +224,34 @@ app.post("/api/ideas/:id/vote/:ideaIndex", async (req, res) => {
       
       if (db.ideas[id].votes[idx] !== undefined) {
            db.ideas[id].votes[idx] += 1;
+           // Notification Logic
+           const authorId = db.ideas[id].authorId;
+           if (authorId) {
+             const ideaObj = db.ideas[id].idea[idx];
+             const ideaTitle = ideaObj && typeof ideaObj === 'object' && ideaObj.titulo ? ideaObj.titulo : `Idea #${idx + 1}`;
+             const notif = {
+               id: crypto.randomUUID(),
+               message: `👍 ¡Alguien votó por tu idea "${ideaTitle}"!`,
+               ideaId: id,
+               ideaIndex: idx,
+               timestamp: Date.now(),
+               read: false
+             };
+             
+             if (!db.notifications) db.notifications = {};
+             if (!db.notifications[authorId]) db.notifications[authorId] = [];
+             db.notifications[authorId].push(notif);
+             
+             // Notify via SSE
+             if (sseClients.has(authorId)) {
+               const clients = sseClients.get(authorId)!;
+               const dataStr = `data: ${JSON.stringify(notif)}\n\n`;
+               for (const client of clients) {
+                 client.write(dataStr);
+               }
+             }
+           }
+
            await fs.writeFile(DATA_FILE, JSON.stringify(db, null, 2));
            res.json({ votes: db.ideas[id].votes });
       } else {
