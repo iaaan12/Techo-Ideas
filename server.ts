@@ -134,19 +134,45 @@ app.post("/api/ideas/:id/vote/:ideaIndex", async (req, res) => {
 
 async function setupVite() {
   if (process.env.NODE_ENV !== "production" && !isVercel) {
-    // Development mode: integration with Vite
     const { createServer: createViteServer } = await import("vite");
     const vite = await createViteServer({
       server: { middlewareMode: true },
       appType: "spa",
     });
     app.use(vite.middlewares);
+    
+    app.use('*', async (req, res, next) => {
+      try {
+        let template = await fs.readFile(path.join(process.cwd(), 'index.html'), 'utf-8');
+        
+        // Inject env vars
+        template = template.replace("%%NVIDIA_API_KEY_1%%", process.env.NVIDIA_API_KEY_1 || "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");
+        template = template.replace("%%NVIDIA_API_KEY_2%%", process.env.NVIDIA_API_KEY_2 || "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");
+        template = template.replace("%%NVIDIA_API_KEY_3%%", process.env.NVIDIA_API_KEY_3 || "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");
+        template = template.replace("%%NVIDIA_API_KEY_4%%", process.env.NVIDIA_API_KEY_4 || "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");
+        
+        const html = await vite.transformIndexHtml(req.originalUrl, template);
+        res.status(200).set({ 'Content-Type': 'text/html' }).end(html);
+      } catch (e: any) {
+        vite.ssrFixStacktrace(e);
+        next(e);
+      }
+    });
   } else {
     // Production mode: serving index.html
     const distPath = path.join(process.cwd(), 'dist');
     app.use(express.static(distPath));
-    app.get('*', (req, res) => {
-      res.sendFile(path.join(distPath, 'index.html'));
+        app.get('*', async (req, res) => {
+      try {
+        let html = await fs.readFile(path.join(distPath, 'index.html'), 'utf-8');
+        html = html.replace("%%NVIDIA_API_KEY_1%%", process.env.NVIDIA_API_KEY_1 || "");
+        html = html.replace("%%NVIDIA_API_KEY_2%%", process.env.NVIDIA_API_KEY_2 || "");
+        html = html.replace("%%NVIDIA_API_KEY_3%%", process.env.NVIDIA_API_KEY_3 || "");
+        html = html.replace("%%NVIDIA_API_KEY_4%%", process.env.NVIDIA_API_KEY_4 || "");
+        res.send(html);
+      } catch (e) {
+        res.status(500).send("Error loading app");
+      }
     });
   }
 }
@@ -158,5 +184,6 @@ setupVite().then(() => {
     });
   }
 });
+
 
 export default app;

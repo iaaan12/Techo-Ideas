@@ -1537,7 +1537,12 @@
             </div>
             <div class="form-group">
               <label class="form-label">Modelo</label>
-              <input type="text" id="cfgModel" class="form-control" />
+              <select id="cfgModel" class="form-control">
+                <option value="deepseek-ai/deepseek-v4-flash">deepseek-ai/deepseek-v4-flash</option>
+                <option value="z-ai/glm-5.1">z-ai/glm-5.1</option>
+                <option value="minimaxai/minimax-m2.7">minimaxai/minimax-m2.7</option>
+                <option value="deepseek-ai/deepseek-v4-pro">deepseek-ai/deepseek-v4-pro</option>
+              </select>
             </div>
             <div class="checkbox-grid">
               <div class="form-group">
@@ -1699,20 +1704,20 @@
       }
 
       const apiKeys = [
-        "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",
-        "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",
-        "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",
-        "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"
+        "%%NVIDIA_API_KEY_1%%",
+        "%%NVIDIA_API_KEY_2%%",
+        "%%NVIDIA_API_KEY_3%%",
+        "%%NVIDIA_API_KEY_4%%"
       ];
       const randomKey = apiKeys[Math.floor(Math.random() * apiKeys.length)];
 
       let config = JSON.parse(localStorage.getItem("techo_config")) || {
         provider: "nvidia",
         baseUrl: "https://integrate.api.nvidia.com/v1",
-        apiKey: randomKey,
+        apiKey: "",
         model: "z-ai/glm-5.1",
         temperature: 0.7,
-        maxTokens: 2048,
+        maxTokens: 16384,
         orgName: "TECHO Argentina — Capítulo Salta",
         mision:
           "Organización que trabaja en la superación de la pobreza extrema, construyendo viviendas de emergencia y promoviendo el desarrollo comunitario en asentamientos informales.",
@@ -1827,7 +1832,7 @@
         document.getElementById("cfgApiKey").value = config.apiKey || "";
         document.getElementById("cfgModel").value = config.model || "";
         document.getElementById("cfgTemp").value = config.temperature || 1;
-        document.getElementById("cfgTokens").value = config.maxTokens || 4096;
+        document.getElementById("cfgTokens").value = config.maxTokens || 16384;
         document.getElementById("cfgOrgName").value = config.orgName || "";
         document.getElementById("cfgMision").value = config.mision || "";
         document.getElementById("cfgPublico").value = config.publico || "";
@@ -1885,7 +1890,7 @@
         config.temperature =
           parseFloat(document.getElementById("cfgTemp").value) || 0.7;
         config.maxTokens =
-          parseInt(document.getElementById("cfgTokens").value) || 2000;
+          parseInt(document.getElementById("cfgTokens").value) || 16384;
         config.orgName = document.getElementById("cfgOrgName").value;
         config.mision = document.getElementById("cfgMision").value;
         config.publico = document.getElementById("cfgPublico").value;
@@ -2145,8 +2150,8 @@ Reglas hiper estrictas por formato:
 - Todo lo relacionado a cómo se ve el post y qué transcurre en el video (guion completo, texto en pantalla, diseño del carrusel, stickers en stories) DEBE ir exclusivamente en el campo 'visual'.`;
 
         try {
-          let currentMaxTokens = config.maxTokens || 2000;
-          if (currentMaxTokens < 500) currentMaxTokens = 2000;
+          let currentMaxTokens = config.maxTokens || 16384;
+          if (currentMaxTokens < 500) currentMaxTokens = 16384;
 
           const requestBody = {
             model: config.model,
@@ -2159,6 +2164,13 @@ Reglas hiper estrictas por formato:
             max_tokens: currentMaxTokens,
             stream: false,
           };
+
+          if (config.model.includes("deepseek-ai/deepseek")) {
+            requestBody.chat_template_kwargs = {
+              thinking: true,
+              reasoning_effort: "max",
+            };
+          }
 
           // Add response_format for OpenAI models via OpenRouter to ensure JSON
           if (
