@@ -260,7 +260,11 @@
       .btn-primary {
         width: 100%;
         padding: 1rem;
-        background: linear-gradient(135deg, var(--techo-blue), var(--techo-blue-dark));
+        background: linear-gradient(
+          135deg,
+          var(--techo-blue),
+          var(--techo-blue-dark)
+        );
         color: var(--white);
         border-radius: var(--border-radius);
         font-weight: 700;
@@ -275,16 +279,29 @@
       .btn-primary::before {
         content: "";
         position: absolute;
-        top: 0; left: -100%;
-        width: 50%; height: 100%;
-        background: linear-gradient(to right, transparent, rgba(255,255,255,0.2), transparent);
+        top: 0;
+        left: -100%;
+        width: 50%;
+        height: 100%;
+        background: linear-gradient(
+          to right,
+          transparent,
+          rgba(255, 255, 255, 0.2),
+          transparent
+        );
         transform: skewX(-20deg);
         animation: shine 3s infinite;
       }
       @keyframes shine {
-        0% { left: -100%; }
-        20% { left: 200%; }
-        100% { left: 200%; }
+        0% {
+          left: -100%;
+        }
+        20% {
+          left: 200%;
+        }
+        100% {
+          left: 200%;
+        }
       }
       .btn-primary:hover:not(:disabled) {
         transform: translate(2px, 2px);
@@ -324,7 +341,8 @@
         border-radius: 0.25rem;
       }
 
-      input[type="checkbox"], input[type="range"] {
+      input[type="checkbox"],
+      input[type="range"] {
         accent-color: var(--techo-blue);
       }
 
@@ -421,11 +439,12 @@
       .tab-btn.active {
         background: var(--white);
         color: var(--techo-blue);
-        box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
       }
-      
+
       /* Tooltip for tab-btn on hover */
-      .tab-btn::after, [data-tooltip]::after {
+      .tab-btn::after,
+      [data-tooltip]::after {
         content: attr(data-title);
         position: absolute;
         bottom: -35px;
@@ -441,7 +460,7 @@
         white-space: nowrap;
         transition: all 0.2s ease;
         z-index: 100;
-        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
         text-transform: none;
         font-family: var(--font-body);
         font-weight: 500;
@@ -451,11 +470,12 @@
         bottom: calc(100% + 5px); /* Above the element by default */
         transform: translateX(-50%) translateY(5px);
       }
-      .tab-btn[data-title]:hover::after, [data-tooltip]:hover::after {
+      .tab-btn[data-title]:hover::after,
+      [data-tooltip]:hover::after {
         opacity: 1;
         transform: translateX(-50%) translateY(0);
       }
-      
+
       .btn-icon-only {
         padding: 0.6rem;
         display: flex;
@@ -628,12 +648,12 @@
         background: var(--color-story);
       }
       .preview-btn-header:hover {
-        background: rgba(255,255,255,0.2) !important;
-        border-color: rgba(255,255,255,0.4) !important;
+        background: rgba(255, 255, 255, 0.2) !important;
+        border-color: rgba(255, 255, 255, 0.4) !important;
       }
       .idea-header[data-type="reel"] .preview-btn-header:hover {
-        background: rgba(0,0,0,0.1) !important;
-        border-color: rgba(0,0,0,0.2) !important;
+        background: rgba(0, 0, 0, 0.1) !important;
+        border-color: rgba(0, 0, 0, 0.2) !important;
       }
 
       .idea-body {
@@ -1048,6 +1068,26 @@
           max-width: 320px;
         }
       }
+      @keyframes slideInRight {
+        from {
+          opacity: 0;
+          transform: translateX(100%);
+        }
+        to {
+          opacity: 1;
+          transform: translateX(0);
+        }
+      }
+      @keyframes slideOutRight {
+        from {
+          opacity: 1;
+          transform: translateX(0);
+        }
+        to {
+          opacity: 0;
+          transform: translateX(100%);
+        }
+      }
     </style>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
@@ -1096,7 +1136,7 @@
           </div>
         </h1>
         <div class="header-actions">
-          <div style="position: relative;">
+          <div style="position: relative">
             <button
               class="btn btn-outline"
               onclick="toggleNotificationsModal()"
@@ -1217,7 +1257,17 @@
                 id="tabGenerador"
                 data-title="Generador"
               >
-                <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px"><path d="M0 0h24v24H0z" fill="none"/><path d="M19 9l1.25-2.75L23 5l-2.75-1.25L19 1l-1.25 2.75L15 5l2.75 1.25L19 9zm-7.5.5L9 4 6.5 9.5 1 12l5.5 2.5L9 20l2.5-5.5L17 12l-5.5-2.5zM19 15l-1.25 2.75L15 19l2.75 1.25L19 23l1.25-2.75L23 19l-2.75-1.25L19 15z"/></svg>
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  height="24px"
+                  viewBox="0 0 24 24"
+                  width="24px"
+                >
+                  <path d="M0 0h24v24H0z" fill="none" />
+                  <path
+                    d="M19 9l1.25-2.75L23 5l-2.75-1.25L19 1l-1.25 2.75L15 5l2.75 1.25L19 9zm-7.5.5L9 4 6.5 9.5 1 12l5.5 2.5L9 20l2.5-5.5L17 12l-5.5-2.5zM19 15l-1.25 2.75L15 19l2.75 1.25L19 23l1.25-2.75L23 19l-2.75-1.25L19 15z"
+                  />
+                </svg>
               </button>
               <button
                 class="tab-btn"
@@ -1225,7 +1275,17 @@
                 id="tabHistorial"
                 data-title="Historial"
               >
-                <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px"><path d="M0 0h24v24H0z" fill="none"/><path d="M13 3c-4.97 0-9 4.03-9 9H1l3.89 3.89.07.14L9 12H6c0-3.87 3.13-7 7-7s7 3.13 7 7-3.13 7-7 7c-1.93 0-3.68-.79-4.94-2.06l-1.42 1.42C8.27 19.99 10.51 21 13 21c4.97 0 9-4.03 9-9s-4.03-9-9-9zm-1 5v5l4.28 2.54.72-1.21-3.5-2.08V8H12z"/></svg>
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  height="24px"
+                  viewBox="0 0 24 24"
+                  width="24px"
+                >
+                  <path d="M0 0h24v24H0z" fill="none" />
+                  <path
+                    d="M13 3c-4.97 0-9 4.03-9 9H1l3.89 3.89.07.14L9 12H6c0-3.87 3.13-7 7-7s7 3.13 7 7-3.13 7-7 7c-1.93 0-3.68-.79-4.94-2.06l-1.42 1.42C8.27 19.99 10.51 21 13 21c4.97 0 9-4.03 9-9s-4.03-9-9-9zm-1 5v5l4.28 2.54.72-1.21-3.5-2.08V8H12z"
+                  />
+                </svg>
               </button>
               <button
                 class="tab-btn"
@@ -1233,7 +1293,17 @@
                 id="tabFavoritos"
                 data-title="Favoritos"
               >
-                <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px"><path d="M0 0h24v24H0z" fill="none"/><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  height="24px"
+                  viewBox="0 0 24 24"
+                  width="24px"
+                >
+                  <path d="M0 0h24v24H0z" fill="none" />
+                  <path
+                    d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"
+                  />
+                </svg>
               </button>
             </div>
 
@@ -1369,9 +1439,7 @@
                 style="width: 100%"
                 onclick="generarIdeas()"
               >
-                <span id="btnGenerarText">
-                  Generar Ideas
-                </span>
+                <span id="btnGenerarText"> Generar Ideas </span>
               </button>
               <div
                 id="errorMsg"
@@ -1386,9 +1454,33 @@
             </div>
 
             <div id="panelHistorial" class="tab-content">
-              <div style="display:flex; flex-direction:column; gap:0.5rem; margin-bottom: 1rem;">
-                <label for="historialFilter" style="font-size: 0.75rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase;">Filtrar por formato:</label>
-                <select id="historialFilter" class="form-input" style="padding: 0.4rem 0.5rem; font-size: 0.85rem;" onchange="historyCurrentPage = 1; renderHistory()">
+              <div
+                style="
+                  display: flex;
+                  flex-direction: column;
+                  gap: 0.5rem;
+                  margin-bottom: 1rem;
+                "
+              >
+                <label
+                  for="historialFilter"
+                  style="
+                    font-size: 0.75rem;
+                    font-weight: 700;
+                    color: var(--text-muted);
+                    text-transform: uppercase;
+                  "
+                  >Filtrar por formato:</label
+                >
+                <select
+                  id="historialFilter"
+                  class="form-input"
+                  style="padding: 0.4rem 0.5rem; font-size: 0.85rem"
+                  onchange="
+                    historyCurrentPage = 1;
+                    renderHistory();
+                  "
+                >
                   <option value="all">Todos los formatos</option>
                   <option value="post">Post Estático</option>
                   <option value="carrusel">Carrusel</option>
@@ -1397,7 +1489,14 @@
                 </select>
               </div>
               <div id="historialList"></div>
-              <button id="btnLoadMoreHistory" class="btn btn-outline btn-small" style="width: 100%; display: none; margin-top: 1rem;" onclick="loadMoreHistory()">Cargar más</button>
+              <button
+                id="btnLoadMoreHistory"
+                class="btn btn-outline btn-small"
+                style="width: 100%; display: none; margin-top: 1rem"
+                onclick="loadMoreHistory()"
+              >
+                Cargar más
+              </button>
             </div>
 
             <div id="panelFavoritos" class="tab-content">
@@ -1482,6 +1581,20 @@
       </main>
     </div>
 
+    <!-- Toast Notificaciones -->
+    <div
+      id="toastContainer"
+      style="
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        z-index: 9999;
+      "
+    ></div>
+
     <!-- Modal Notificaciones -->
     <div id="notificationsModal" class="modal-overlay">
       <div
@@ -1490,10 +1603,14 @@
       >
         <div class="modal-header">
           <h2>🔔 Notificaciones</h2>
-          <button class="close-btn" onclick="closeNotificationsModal()">×</button>
+          <button class="close-btn" onclick="closeNotificationsModal()">
+            ×
+          </button>
         </div>
-        <div class="modal-body" id="notificationsBody" style="text-align: left;">
-          <div style="text-align: center; color: var(--text-muted); padding: 1rem;">
+        <div class="modal-body" id="notificationsBody" style="text-align: left">
+          <div
+            style="text-align: center; color: var(--text-muted); padding: 1rem"
+          >
             No tienes notificaciones
           </div>
         </div>
@@ -1593,10 +1710,16 @@
             <div class="form-group">
               <label class="form-label">Modelo</label>
               <select id="cfgModel" class="form-control">
-                <option value="deepseek-ai/deepseek-v4-flash">deepseek-ai/deepseek-v4-flash</option>
+                <option value="deepseek-ai/deepseek-v4-flash">
+                  deepseek-ai/deepseek-v4-flash
+                </option>
                 <option value="z-ai/glm-5.1">z-ai/glm-5.1</option>
-                <option value="minimaxai/minimax-m2.7">minimaxai/minimax-m2.7</option>
-                <option value="deepseek-ai/deepseek-v4-pro">deepseek-ai/deepseek-v4-pro</option>
+                <option value="minimaxai/minimax-m2.7">
+                  minimaxai/minimax-m2.7
+                </option>
+                <option value="deepseek-ai/deepseek-v4-pro">
+                  deepseek-ai/deepseek-v4-pro
+                </option>
               </select>
             </div>
             <div class="checkbox-grid">
@@ -1731,97 +1854,138 @@
       let favoritos = JSON.parse(localStorage.getItem("techo_favoritos")) || [];
       let authorId = localStorage.getItem("techo_authorId");
       if (!authorId) {
-         try {
-           authorId = crypto.randomUUID();
-         } catch(e) {
-           authorId = 'id-' + Date.now() + '-' + Math.random().toString(36).substr(2, 9);
-         }
-         localStorage.setItem("techo_authorId", authorId);
+        try {
+          authorId = crypto.randomUUID();
+        } catch (e) {
+          authorId =
+            "id-" + Date.now() + "-" + Math.random().toString(36).substr(2, 9);
+        }
+        localStorage.setItem("techo_authorId", authorId);
       }
 
       // --- Notificaciones ---
       let notifications = [];
       let sseConnection = null;
 
-      function initNotifications() {
-         fetch(`/api/notifications?authorId=${authorId}`)
-           .then(res => res.json())
-           .then(data => {
-             notifications = data;
-             updateNotificationsUI();
-           })
-           .catch(e => console.error("Error loading notifications:", e));
+      function showToast(message, ideaId) {
+        const container = document.getElementById("toastContainer");
+        const toast = document.createElement("div");
+        toast.style.background = "#fff";
+        toast.style.border = "2px solid var(--techo-black)";
+        toast.style.borderRadius = "8px";
+        toast.style.padding = "15px 20px";
+        toast.style.boxShadow = "4px 4px 0px 0px var(--techo-black)";
+        toast.style.color = "#111";
+        toast.style.fontWeight = "bold";
+        toast.style.display = "flex";
+        toast.style.alignItems = "center";
+        toast.style.gap = "10px";
+        toast.style.cursor = "pointer";
+        toast.style.animation = "slideInRight 0.3s ease forwards";
+        toast.innerHTML = `<span style="font-size:1.2rem;">🔔</span> <span>${message}</span>`;
 
-         sseConnection = new EventSource(`/api/notifications/stream?authorId=${authorId}`);
-         sseConnection.onmessage = (event) => {
-           try {
-             const notif = JSON.parse(event.data);
-             notifications.push(notif);
-             updateNotificationsUI();
-             playPopSound();
-           } catch(e) {}
-         };
+        toast.onclick = () => {
+          viewSharedIdea(ideaId);
+          toast.remove();
+        };
+
+        container.appendChild(toast);
+        setTimeout(() => {
+          toast.style.animation = "slideOutRight 0.3s ease forwards";
+          setTimeout(() => toast.remove(), 300);
+        }, 5000);
+      }
+
+      function initNotifications() {
+        fetch(`/api/notifications?authorId=${authorId}`)
+          .then((res) => res.json())
+          .then((data) => {
+            notifications = data;
+            updateNotificationsUI();
+          })
+          .catch((e) => console.error("Error loading notifications:", e));
+
+        sseConnection = new EventSource(
+          `/api/notifications/stream?authorId=${authorId}`,
+        );
+        sseConnection.onmessage = (event) => {
+          try {
+            const notif = JSON.parse(event.data);
+            notifications.push(notif);
+            updateNotificationsUI();
+            playSuccessSound();
+            showToast(notif.message, notif.ideaId);
+          } catch (e) {}
+        };
       }
 
       function updateNotificationsUI() {
-         const unreadCount = notifications.filter(n => !n.read).length;
-         const badge = document.getElementById("notifBadge");
-         if (badge) {
-            if (unreadCount > 0) {
-               badge.style.display = "flex";
-               badge.innerText = unreadCount > 9 ? "9+" : unreadCount;
-            } else {
-               badge.style.display = "none";
-            }
-         }
+        const unreadCount = notifications.filter((n) => !n.read).length;
+        const badge = document.getElementById("notifBadge");
+        if (badge) {
+          if (unreadCount > 0) {
+            badge.style.display = "flex";
+            badge.innerText = unreadCount > 9 ? "9+" : unreadCount;
+          } else {
+            badge.style.display = "none";
+          }
+        }
 
-         const body = document.getElementById("notificationsBody");
-         if (body) {
-            if (notifications.length === 0) {
-              body.innerHTML = `<div style="text-align: center; color: var(--text-muted); padding: 1rem;">No tienes notificaciones</div>`;
-            } else {
-              body.innerHTML = notifications.slice().reverse().map(n => `
-                <div style="padding: 1rem; border-bottom: 1px solid #efefef; background: ${n.read ? '#fff' : '#f0fafe'}; cursor: pointer;" onclick="viewSharedIdea('${n.ideaId}')">
+        const body = document.getElementById("notificationsBody");
+        if (body) {
+          if (notifications.length === 0) {
+            body.innerHTML = `<div style="text-align: center; color: var(--text-muted); padding: 1rem;">No tienes notificaciones</div>`;
+          } else {
+            body.innerHTML = notifications
+              .slice()
+              .reverse()
+              .map(
+                (n) => `
+                <div style="padding: 1rem; border-bottom: 1px solid #efefef; background: ${n.read ? "#fff" : "#f0fafe"}; cursor: pointer;" onclick="viewSharedIdea('${n.ideaId}')">
                   <div style="font-size: 0.9rem; color: #111;">${n.message}</div>
                   <div style="font-size: 0.75rem; color: var(--text-muted); margin-top: 4px;">
                      ${new Date(n.timestamp).toLocaleString()}
                   </div>
                 </div>
-              `).join('');
-            }
-         }
+              `,
+              )
+              .join("");
+          }
+        }
       }
 
       function viewSharedIdea(id) {
-         closeNotificationsModal();
-         const url = new URL(window.location);
-         url.searchParams.set("shared", id);
-         window.history.pushState({}, "", url);
-         initSharedIdea();
+        closeNotificationsModal();
+        const url = new URL(window.location);
+        url.searchParams.set("shared", id);
+        window.history.pushState({}, "", url);
+        initSharedIdea();
       }
 
       function toggleNotificationsModal() {
-         const modal = document.getElementById("notificationsModal");
-         if (modal.classList.contains("active")) {
-            closeNotificationsModal();
-         } else {
-            modal.classList.add("active");
-            // Marcar como leidas
-            const unreadCount = notifications.filter(n => !n.read).length;
-            if (unreadCount > 0) {
-               notifications.forEach(n => n.read = true);
-               updateNotificationsUI();
-               fetch('/api/notifications/read', {
-                  method: 'POST',
-                  headers: { 'Content-Type': 'application/json' },
-                  body: JSON.stringify({ authorId })
-               });
-            }
-         }
+        const modal = document.getElementById("notificationsModal");
+        if (modal.classList.contains("active")) {
+          closeNotificationsModal();
+        } else {
+          modal.classList.add("active");
+          // Marcar como leidas
+          const unreadCount = notifications.filter((n) => !n.read).length;
+          if (unreadCount > 0) {
+            notifications.forEach((n) => (n.read = true));
+            updateNotificationsUI();
+            fetch("/api/notifications/read", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ authorId }),
+            });
+          }
+        }
       }
 
       function closeNotificationsModal() {
-         document.getElementById("notificationsModal").classList.remove("active");
+        document
+          .getElementById("notificationsModal")
+          .classList.remove("active");
       }
 
       let theme = localStorage.getItem("techo_theme") || "light";
@@ -1885,7 +2049,7 @@
           "Situación de pobreza",
           "Trabajo en conjunto",
           "Participar, Involucrar, Compartir, Aportar",
-          "Asentamiento popular"
+          "Asentamiento popular",
         ],
         forbidden: [
           "pobres",
@@ -1899,7 +2063,7 @@
           "Los más necesitados",
           "Pobreza extrema",
           "Trabajar para / por",
-          "Usted"
+          "Usted",
         ],
         hashtags: [
           "TECHO",
@@ -2027,7 +2191,10 @@
       function saveConfig() {
         config.provider = document.getElementById("cfgProvider").value;
         config.baseUrl = document.getElementById("cfgBaseUrl").value;
-        config.apiKey = document.getElementById("cfgApiKey").value.trim().replace(/[^\x20-\x7E]/g, "");
+        config.apiKey = document
+          .getElementById("cfgApiKey")
+          .value.trim()
+          .replace(/[^\x20-\x7E]/g, "");
         config.model = document.getElementById("cfgModel").value;
         config.temperature =
           parseFloat(document.getElementById("cfgTemp").value) || 0.7;
@@ -2333,7 +2500,7 @@ Reglas hiper estrictas por formato:
               url: `${config.baseUrl}/chat/completions`,
               headers: {
                 "Content-Type": "application/json",
-                Authorization: `Bearer ${config.apiKey.replace(/[^\x20-\x7E]/g, '')}`,
+                Authorization: `Bearer ${config.apiKey.replace(/[^\x20-\x7E]/g, "")}`,
                 "HTTP-Referer": window.location.href,
                 "X-Title": "TECHO Argentina Lab",
               },
@@ -2348,7 +2515,7 @@ Reglas hiper estrictas por formato:
 
           clearInterval(loadingInterval);
           if (thematicTextEl) {
-             thematicTextEl.innerHTML = "Iniciando stream de datos...";
+            thematicTextEl.innerHTML = "Iniciando stream de datos...";
           }
 
           const reader = response.body.getReader();
@@ -2361,18 +2528,18 @@ Reglas hiper estrictas por formato:
             const { value, done } = await reader.read();
             if (done) break;
             buffer += decoder.decode(value, { stream: true });
-            const lines = buffer.split('\n');
+            const lines = buffer.split("\n");
             buffer = lines.pop() || "";
             for (const line of lines) {
               const trimmed = line.trim();
-              if (trimmed.startsWith('data: ') && trimmed !== 'data: [DONE]') {
+              if (trimmed.startsWith("data: ") && trimmed !== "data: [DONE]") {
                 try {
                   const dataObj = JSON.parse(trimmed.slice(6));
                   const delta = dataObj.choices[0]?.delta || {};
                   if (delta.reasoning || delta.reasoning_content) {
-                    reasoningText += (delta.reasoning || delta.reasoning_content);
+                    reasoningText += delta.reasoning || delta.reasoning_content;
                     if (thematicTextEl && reasoningText.length > 0) {
-                      thematicTextEl.innerHTML = `<span style="opacity:0.8; font-size: 0.9em; line-height: 1.4; display:block; max-height: 200px; overflow-y: auto; text-align: left; background: rgba(0,0,0,0.05); padding: 10px; border-radius: 8px;" id="reasoningBox">${reasoningText.replace(/\n/g, '<br>')}</span>`;
+                      thematicTextEl.innerHTML = `<span style="opacity:0.8; font-size: 0.9em; line-height: 1.4; display:block; max-height: 200px; overflow-y: auto; text-align: left; background: rgba(0,0,0,0.05); padding: 10px; border-radius: 8px;" id="reasoningBox">${reasoningText.replace(/\n/g, "<br>")}</span>`;
                       const box = document.getElementById("reasoningBox");
                       if (box) box.scrollTop = box.scrollHeight;
                     }
@@ -2380,7 +2547,7 @@ Reglas hiper estrictas por formato:
                   if (delta.content) {
                     contentText += delta.content;
                     if (thematicTextEl && !reasoningText) {
-                       thematicTextEl.innerHTML = "Generando respuesta final...";
+                      thematicTextEl.innerHTML = "Generando respuesta final...";
                     }
                   }
                 } catch (e) {
@@ -2436,8 +2603,16 @@ Reglas hiper estrictas por formato:
         } catch (error) {
           console.error(error);
           let errMsg = error.message;
-          if (errMsg.includes("Load failed") || errMsg.includes("Failed to fetch") || errMsg.includes("NetworkError") || errMsg.includes("pre-flight") || errMsg.includes("fetch failed") || errMsg.includes("The user aborted a request")) {
-             errMsg = "La conexión se interrumpió de forma inesperada. Esto puede suceder al cambiar de pestaña minimizando el navegador en tu celular.";
+          if (
+            errMsg.includes("Load failed") ||
+            errMsg.includes("Failed to fetch") ||
+            errMsg.includes("NetworkError") ||
+            errMsg.includes("pre-flight") ||
+            errMsg.includes("fetch failed") ||
+            errMsg.includes("The user aborted a request")
+          ) {
+            errMsg =
+              "La conexión se interrumpió de forma inesperada. Esto puede suceder al cambiar de pestaña minimizando el navegador en tu celular.";
           }
           errorMsg.textContent = `Error: ${errMsg}. Revisá la conectividad y configuración.`;
           errorMsg.style.display = "block";
@@ -2561,12 +2736,15 @@ Reglas hiper estrictas por formato:
       function renderHistory() {
         const list = document.getElementById("historialList");
         const btnLoadMore = document.getElementById("btnLoadMoreHistory");
-        
+
         let filteredHistory = history;
-        const filterVal = document.getElementById("historialFilter")?.value || "all";
+        const filterVal =
+          document.getElementById("historialFilter")?.value || "all";
         if (filterVal !== "all") {
-          filteredHistory = history.filter(entry => 
-            entry.ideas.some(idea => idea.tipo.toLowerCase().includes(filterVal))
+          filteredHistory = history.filter((entry) =>
+            entry.ideas.some((idea) =>
+              idea.tipo.toLowerCase().includes(filterVal),
+            ),
           );
         }
 
@@ -2578,7 +2756,7 @@ Reglas hiper estrictas por formato:
         }
 
         list.innerHTML = "";
-        
+
         const limit = historyCurrentPage * HISTORY_PER_PAGE;
         const visibleHistory = filteredHistory.slice(0, limit);
 
@@ -2622,7 +2800,7 @@ Reglas hiper estrictas por formato:
                 `;
           list.appendChild(item);
         });
-        
+
         if (filteredHistory.length > limit) {
           if (btnLoadMore) btnLoadMore.style.display = "block";
         } else {
@@ -2640,7 +2818,10 @@ Reglas hiper estrictas por formato:
           const response = await fetch("/api/ideas/share", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ idea: currentIdeasGlobal, authorId: authorId }),
+            body: JSON.stringify({
+              idea: currentIdeasGlobal,
+              authorId: authorId,
+            }),
           });
 
           if (response.ok) {
@@ -2820,8 +3001,7 @@ Reglas hiper estrictas por formato:
 
       let currentIdeasGlobal = [];
 
-      const TECHO_SALTA_PFP =
-        "https://i.imgur.com/iIktsdS.jpeg";
+      const TECHO_SALTA_PFP = "https://i.imgur.com/iIktsdS.jpeg";
       const TECHO_SALTA_USER = "comunidadtecho_salta";
 
       function openPreviewMockup(index) {
@@ -2913,7 +3093,7 @@ Reglas hiper estrictas por formato:
                         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
                         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-left:auto"><path d="m19 21-7-4-7 4V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v16z"/></svg>
                     </div>
-                    <div class="mockup-caption"><span style="font-weight: 600;">${TECHO_SALTA_USER}</span><span>${formattedCopy.replace(/^(<br>|\s)+/, '').replace(/^\n+/, '')}</span></div>
+                    <div class="mockup-caption"><span style="font-weight: 600;">${TECHO_SALTA_USER}</span><span>${formattedCopy.replace(/^(<br>|\s)+/, "").replace(/^\n+/, "")}</span></div>
                 `;
         }
 
