@@ -1877,7 +1877,7 @@
       function saveConfig() {
         config.provider = document.getElementById("cfgProvider").value;
         config.baseUrl = document.getElementById("cfgBaseUrl").value;
-        config.apiKey = document.getElementById("cfgApiKey").value;
+        config.apiKey = document.getElementById("cfgApiKey").value.trim().replace(/[^\x20-\x7E]/g, "");
         config.model = document.getElementById("cfgModel").value;
         config.temperature =
           parseFloat(document.getElementById("cfgTemp").value) || 0.7;
@@ -2183,7 +2183,7 @@ Reglas hiper estrictas por formato:
               url: `${config.baseUrl}/chat/completions`,
               headers: {
                 "Content-Type": "application/json",
-                Authorization: `Bearer ${config.apiKey}`,
+                Authorization: `Bearer ${config.apiKey.replace(/[^\x20-\x7E]/g, '')}`,
                 "HTTP-Referer": window.location.href,
                 "X-Title": "TECHO Argentina Lab",
               },

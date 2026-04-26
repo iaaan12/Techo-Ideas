@@ -36,10 +36,21 @@ app.post("/api/proxy", async (req, res) => {
       return res.status(400).json({ error: { message: "Invalid request: 'url' parameter is missing. Body was: " + JSON.stringify(reqBody).substring(0, 50) } });
     }
     
+    const cleanHeaders: Record<string, string> = {};
+    if (headers) {
+      for (const [key, value] of Object.entries(headers)) {
+        if (typeof value === "string") {
+          cleanHeaders[key] = value.replace(/[^\x20-\x7E]/g, "");
+        } else {
+          cleanHeaders[key] = String(value);
+        }
+      }
+    }
+
     const response = await fetch(url, {
-      method: 'POST',
-      headers: headers || {},
-      body: JSON.stringify(body || {})
+      method: "POST",
+      headers: cleanHeaders,
+      body: JSON.stringify(body || {}),
     });
     
     if (!response.ok) {
