@@ -27,9 +27,9 @@
         --warning: #f59e0b;
 
         --color-post: #0092dd;
-        --color-carousel: #7c3aed;
-        --color-reel: #e53e3e;
-        --color-story: #f59e0b;
+        --color-carousel: #007bb5;
+        --color-reel: #ffd100;
+        --color-story: #ff6b6b;
 
         /* Fonts */
         --font-headings: "Fredoka", sans-serif;
@@ -260,7 +260,7 @@
       .btn-primary {
         width: 100%;
         padding: 1rem;
-        background: var(--techo-black);
+        background: linear-gradient(135deg, var(--techo-blue), var(--techo-blue-dark));
         color: var(--white);
         border-radius: var(--border-radius);
         font-weight: 700;
@@ -269,10 +269,26 @@
         letter-spacing: 0.05em;
         box-shadow: var(--shadow-brutal);
         border: var(--border-thick);
+        position: relative;
+        overflow: hidden;
+      }
+      .btn-primary::before {
+        content: "";
+        position: absolute;
+        top: 0; left: -100%;
+        width: 50%; height: 100%;
+        background: linear-gradient(to right, transparent, rgba(255,255,255,0.2), transparent);
+        transform: skewX(-20deg);
+        animation: shine 3s infinite;
+      }
+      @keyframes shine {
+        0% { left: -100%; }
+        20% { left: 200%; }
+        100% { left: 200%; }
       }
       .btn-primary:hover:not(:disabled) {
         transform: translate(2px, 2px);
-        background: #2c3136;
+        background: linear-gradient(135deg, #0081c3, #00608f);
         box-shadow: var(--shadow-brutal-hover);
       }
       .btn-primary:disabled {
@@ -306,6 +322,10 @@
         padding: 0.25rem 0.5rem;
         font-size: 0.75rem;
         border-radius: 0.25rem;
+      }
+
+      input[type="checkbox"], input[type="range"] {
+        accent-color: var(--techo-blue);
       }
 
       /* Custom Checkbox/Radio */
@@ -363,27 +383,88 @@
 
       .tabs {
         display: flex;
-        gap: 0.75rem;
+        gap: 0.5rem;
         flex-wrap: wrap;
-        border-bottom: 1px solid rgba(13, 27, 42, 0.1);
-        padding-bottom: 0.25rem;
+        background: var(--bg-cream);
+        padding: 0.35rem;
+        border-radius: 0.75rem;
+        border: 1px solid rgba(13, 27, 42, 0.05);
         margin-bottom: 1.25rem;
       }
       .tab-btn {
+        flex: 1;
+        display: flex;
+        align-items: center;
+        justify-content: center;
         font-size: 0.8rem;
         font-weight: 700;
-        background: none;
+        background: transparent;
         border: none;
-        padding: 0 0.25rem 0.5rem 0.25rem;
+        padding: 0.5rem;
         color: var(--text-muted);
         cursor: pointer;
-        border-bottom: 2px solid transparent;
-        margin-bottom: -0.25rem;
+        border-radius: 0.5rem;
+        position: relative;
         text-transform: uppercase;
+        transition: all 0.2s;
+        margin-bottom: 0;
+      }
+      .tab-btn svg {
+        width: 24px;
+        height: 24px;
+        fill: currentColor;
+      }
+      .tab-btn:hover {
+        background: rgba(17, 24, 39, 0.05);
+        color: var(--text-dark);
       }
       .tab-btn.active {
-        color: var(--text-dark);
-        border-bottom-color: var(--techo-blue);
+        background: var(--white);
+        color: var(--techo-blue);
+        box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+      }
+      
+      /* Tooltip for tab-btn on hover */
+      .tab-btn::after, [data-tooltip]::after {
+        content: attr(data-title);
+        position: absolute;
+        bottom: -35px;
+        left: 50%;
+        transform: translateX(-50%) translateY(-5px);
+        background: var(--techo-black);
+        color: var(--white);
+        padding: 6px 10px;
+        font-size: 0.75rem;
+        border-radius: 4px;
+        opacity: 0;
+        pointer-events: none;
+        white-space: nowrap;
+        transition: all 0.2s ease;
+        z-index: 100;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        text-transform: none;
+        font-family: var(--font-body);
+        font-weight: 500;
+      }
+      [data-tooltip]::after {
+        content: attr(data-tooltip);
+        bottom: calc(100% + 5px); /* Above the element by default */
+        transform: translateX(-50%) translateY(5px);
+      }
+      .tab-btn[data-title]:hover::after, [data-tooltip]:hover::after {
+        opacity: 1;
+        transform: translateX(-50%) translateY(0);
+      }
+      
+      .btn-icon-only {
+        padding: 0.6rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        aspect-ratio: 1/1;
+      }
+      .btn-icon-only svg {
+        margin: 0 !important;
       }
 
       .tab-content {
@@ -520,13 +601,13 @@
       }
 
       .idea-header {
-        padding: 1rem;
+        padding: 1rem 1.25rem;
         display: flex;
         justify-content: space-between;
         align-items: center;
         cursor: pointer;
         color: var(--white);
-        font-size: 0.75rem; /* 12px */
+        font-size: 0.85rem;
         font-weight: 700;
         text-transform: uppercase;
         letter-spacing: 0.05em;
@@ -541,9 +622,18 @@
       }
       .idea-header[data-type="reel"] {
         background: var(--color-reel);
+        color: var(--techo-black);
       }
       .idea-header[data-type="story"] {
         background: var(--color-story);
+      }
+      .preview-btn-header:hover {
+        background: rgba(255,255,255,0.2) !important;
+        border-color: rgba(255,255,255,0.4) !important;
+      }
+      .idea-header[data-type="reel"] .preview-btn-header:hover {
+        background: rgba(0,0,0,0.1) !important;
+        border-color: rgba(0,0,0,0.2) !important;
       }
 
       .idea-body {
@@ -575,31 +665,29 @@
 
       .idea-section-title {
         font-weight: 700;
-        font-size: 1.125rem;
-        font-style: italic;
-        line-height: 1.2;
-        color: var(--text-dark);
-        margin-bottom: 0.5rem;
+        font-size: 1.1rem;
         display: flex;
         align-items: center;
-        justify-content: space-between;
+        color: var(--techo-blue-dark);
+        margin-bottom: 0.75rem;
       }
 
       .idea-section p {
-        font-size: 0.875rem;
-        color: var(--text-muted);
-        line-height: 1.375;
+        font-size: 0.95rem;
+        color: var(--text-dark);
+        line-height: 1.5;
+        margin: 0;
       }
 
       .idea-copy {
-        background: transparent;
-        font-size: 0.875rem;
-        color: var(--text-muted);
-        line-height: 1.375;
+        background: rgba(0, 146, 221, 0.04);
+        border: 1px solid rgba(0, 146, 221, 0.1);
+        border-radius: var(--border-radius);
+        padding: 1rem;
+        font-size: 0.95rem;
+        color: var(--text-dark);
+        line-height: 1.5;
         white-space: pre-wrap;
-        margin-bottom: 0;
-        padding: 0;
-        border-radius: 0;
         word-break: break-word;
         overflow-wrap: break-word;
       }
@@ -1090,22 +1178,25 @@
                 class="tab-btn active"
                 onclick="switchMainTab('generador')"
                 id="tabGenerador"
+                data-title="Generador"
               >
-                Generador
+                <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px"><path d="M0 0h24v24H0z" fill="none"/><path d="M19 9l1.25-2.75L23 5l-2.75-1.25L19 1l-1.25 2.75L15 5l2.75 1.25L19 9zm-7.5.5L9 4 6.5 9.5 1 12l5.5 2.5L9 20l2.5-5.5L17 12l-5.5-2.5zM19 15l-1.25 2.75L15 19l2.75 1.25L19 23l1.25-2.75L23 19l-2.75-1.25L19 15z"/></svg>
               </button>
               <button
                 class="tab-btn"
                 onclick="switchMainTab('historial')"
                 id="tabHistorial"
+                data-title="Historial"
               >
-                Historial
+                <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px"><path d="M0 0h24v24H0z" fill="none"/><path d="M13 3c-4.97 0-9 4.03-9 9H1l3.89 3.89.07.14L9 12H6c0-3.87 3.13-7 7-7s7 3.13 7 7-3.13 7-7 7c-1.93 0-3.68-.79-4.94-2.06l-1.42 1.42C8.27 19.99 10.51 21 13 21c4.97 0 9-4.03 9-9s-4.03-9-9-9zm-1 5v5l4.28 2.54.72-1.21-3.5-2.08V8H12z"/></svg>
               </button>
               <button
                 class="tab-btn"
                 onclick="switchMainTab('favoritos')"
                 id="tabFavoritos"
+                data-title="Favoritos"
               >
-                Favoritos
+                <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px"><path d="M0 0h24v24H0z" fill="none"/><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>
               </button>
             </div>
 
@@ -1241,31 +1332,7 @@
                 style="width: 100%"
                 onclick="generarIdeas()"
               >
-                <span
-                  id="btnGenerarText"
-                  style="display: flex; align-items: center; gap: 8px"
-                >
-                  <svg
-                    width="20"
-                    height="20"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    stroke-width="2"
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                  >
-                    <path
-                      d="m21.64 3.64-1.28-1.28a1.21 1.21 0 0 0-1.72 0L2.36 18.64a1.21 1.21 0 0 0 0 1.72l1.28 1.28a1.2 1.2 0 0 0 1.72 0L21.64 5.36a1.2 1.2 0 0 0 0-1.72Z"
-                    />
-                    <path d="m14 7 3 3" />
-                    <path d="M5 6v4" />
-                    <path d="M19 14v4" />
-                    <path d="M10 2v2" />
-                    <path d="M7 8H3" />
-                    <path d="M21 16h-4" />
-                    <path d="M11 3H9" />
-                  </svg>
+                <span id="btnGenerarText">
                   Generar Ideas
                 </span>
               </button>
@@ -2171,9 +2238,9 @@ Reglas hiper estrictas por formato:
                 <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:1rem; margin-bottom: 1.5rem; column-span:all;">
                     <h2 style="margin:0;">Ideas Generadas</h2>
                     <div style="display:flex; gap:0.5rem;">
-                        <button class="btn btn-outline btn-small" onclick="compartirGeneracion()"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right:2px; vertical-align:-2px;"><circle cx="18" cy="5" r="3"></circle><circle cx="6" cy="12" r="3"></circle><circle cx="18" cy="19" r="3"></circle><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line></svg> Compartir Todas</button>
-                        <button class="btn btn-outline btn-small" onclick="exportarTexto()">📄 Obtener Texto</button>
-                        <button class="btn btn-primary btn-small" style="padding: 0.5rem 1rem; font-size: 0.875rem;" onclick="exportarPDF()">⬇️ Descargar PDF</button>
+                        <button class="btn btn-outline btn-small btn-icon-only" data-tooltip="Compartir Todas" onclick="compartirGeneracion()"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"></circle><circle cx="6" cy="12" r="3"></circle><circle cx="18" cy="19" r="3"></circle><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line></svg></button>
+                        <button class="btn btn-outline btn-small btn-icon-only" data-tooltip="Obtener Texto" onclick="exportarTexto()"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><line x1="10" y1="9" x2="8" y2="9"></line></svg></button>
+                        <button class="btn btn-primary btn-small btn-icon-only" data-tooltip="Descargar PDF" onclick="exportarPDF()"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="12" y1="18" x2="12" y2="12"></line><line x1="9" y1="15" x2="12" y2="18"></line><line x1="15" y1="15" x2="12" y2="18"></line></svg></button>
                     </div>
                 </div>
             `;
@@ -2190,7 +2257,7 @@ Reglas hiper estrictas por formato:
           card.innerHTML = `
                     <div class="idea-header" data-type="${idea.tipo.toLowerCase()}" onclick="this.parentElement.classList.toggle('expanded')">
                         <span>#${index + 1} — ${idea.tipo.toUpperCase()}</span>
-                        <span class="preview-btn-header" onclick="event.stopPropagation(); openPreviewMockup(${index})" style="margin-left:auto; margin-right: 16px; font-size: 0.8rem; background: rgba(0,0,0,0.1); padding: 4px 8px; border-radius: 4px;">👁️ Ver en Celular</span>
+                        <span class="preview-btn-header" data-tooltip="Vista Previa en Celular" onclick="event.stopPropagation(); openPreviewMockup(${index})" style="margin-left:auto; margin-right: 16px; display:flex; align-items:center; justify-content:center; background: rgba(0,0,0,0.1); border-radius: 4px; border: 1px solid rgba(0,0,0,0.1); width:28px; height:28px; transition:all 0.2s;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="2" width="14" height="20" rx="2" ry="2"></rect><line x1="12" y1="18" x2="12.01" y2="18"></line></svg></span>
                         <svg class="toggle-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="transition: transform 0.3s ease"><path d="m6 9 6 6 6-6"/></svg>
                     </div>
                     <div class="idea-body">
@@ -2206,7 +2273,7 @@ Reglas hiper estrictas por formato:
                         <div class="idea-section">
                             <div class="idea-section-title">
                                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right:4px;vertical-align:-3px"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg> Copy / Texto
-                                <button class="btn btn-outline btn-small" style="margin-left:auto" onclick="copyToClipboard(this)">Copiar Copia</button>
+                                <button class="btn btn-outline btn-small btn-icon-only" style="margin-left:auto" data-tooltip="Copiar Texto" onclick="copyToClipboard(this)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg></button>
                             </div>
                             <div class="idea-copy" data-copy-text="${(idea.copy || "").replace(/"/g, "&quot;")}">${idea.copy || ""}</div>
                         </div>
@@ -2219,9 +2286,8 @@ Reglas hiper estrictas por formato:
                         </div>
 
                         <div class="idea-actions" style="margin-top: 1.5rem; border-top: 1px dashed var(--border-color); padding-top: 1rem; display: flex; justify-content: flex-end;">
-                            <button class="btn btn-outline btn-small" onclick="guardarIdeaFavorita(${index})">
-                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
-                                Guardar Idea
+                            <button class="btn btn-outline btn-small btn-icon-only" data-tooltip="Guardar Idea en Favoritos" onclick="guardarIdeaFavorita(${index})">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
                             </button>
                         </div>
                     </div>
@@ -2241,9 +2307,14 @@ Reglas hiper estrictas por formato:
         const text =
           btn.parentElement.parentElement.querySelector(".idea-copy").innerText;
         navigator.clipboard.writeText(text).then(() => {
-          const orig = btn.innerText;
-          btn.innerText = "¡Copiado!";
-          setTimeout(() => (btn.innerText = orig), 2000);
+          const orig = btn.innerHTML;
+          const origColor = btn.style.color;
+          btn.innerHTML = `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>`;
+          btn.style.color = "var(--success)";
+          setTimeout(() => {
+            btn.innerHTML = orig;
+            btn.style.color = origColor;
+          }, 2000);
         });
       }
 
@@ -2589,7 +2660,7 @@ Reglas hiper estrictas por formato:
                         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
                         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-left:auto"><path d="m19 21-7-4-7 4V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v16z"/></svg>
                     </div>
-                    <div class="mockup-caption"><span style="font-weight: 600;">${TECHO_SALTA_USER}</span> <span>${formattedCopy.replace(/^(<br>|\s)+/, '').replace(/^\n+/, '')}</span></div>
+                    <div class="mockup-caption"><span style="font-weight: 600;">${TECHO_SALTA_USER}</span><span>${formattedCopy.replace(/^(<br>|\s)+/, '').replace(/^\n+/, '')}</span></div>
                 `;
         }
 
