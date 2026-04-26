@@ -1770,9 +1770,13 @@
 
       function updateApiStatus() {
         const badge = document.getElementById("apiStatus");
-        // We now use internal rotation for empty keys
-        badge.className = "api-badge connected";
-        badge.innerHTML = "✓ API conectada (Rotación automática)";
+        if (config.apiKey && config.apiKey.trim() !== "") {
+          badge.className = "api-badge connected";
+          badge.innerHTML = "✓ API conectada";
+        } else {
+          badge.className = "api-badge missing";
+          badge.innerHTML = "⚠ Sin API Key";
+        }
       }
 
       // --- UI Navigation ---
@@ -1968,6 +1972,16 @@
 
       // --- Generación de Contenido ---
       async function generarIdeas() {
+        if (!config.apiKey) {
+          openConfigModal();
+          showFeedbackModal(
+            "API Key Requerida",
+            "Por favor, ingresá tu API Key.",
+            "🔑",
+          );
+          return;
+        }
+
         const tiposSeleccionados = Array.from(
           document.querySelectorAll('input[name="tipoContenido"]:checked'),
         ).map((cb) => cb.value);

@@ -36,23 +36,9 @@ app.post("/api/proxy", async (req, res) => {
       return res.status(400).json({ error: { message: "Invalid request: 'url' parameter is missing. Body was: " + JSON.stringify(reqBody).substring(0, 50) } });
     }
     
-    // Inject Server-Side API Keys to keep them hidden from frontend
-    const requestHeaders = { ...headers };
-    if (!requestHeaders["Authorization"] || requestHeaders["Authorization"] === "Bearer " || requestHeaders["Authorization"] === "Bearer null") {
-      const apiKeys = [
-        process.env.NVIDIA_API_KEY_1 || "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",
-        process.env.NVIDIA_API_KEY_2 || "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",
-        process.env.NVIDIA_API_KEY_3 || "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",
-        process.env.NVIDIA_API_KEY_4 || "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"
-      ].filter(Boolean); // just in case
-      
-      const randomKey = apiKeys[Math.floor(Math.random() * apiKeys.length)];
-      requestHeaders["Authorization"] = `Bearer ${randomKey}`;
-    }
-    
     const response = await fetch(url, {
       method: 'POST',
-      headers: requestHeaders,
+      headers: headers || {},
       body: JSON.stringify(body || {})
     });
     
