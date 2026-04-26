@@ -32,9 +32,20 @@ app.post('/api/proxy', async (req, res) => {
       return res.status(400).json({ error: { message: "Invalid request: 'url' missing" } });
     }
     
+    const cleanHeaders: Record<string, string> = {};
+    if (headers) {
+      for (const [key, value] of Object.entries(headers)) {
+        if (typeof value === "string") {
+          cleanHeaders[key] = value.replace(/[^\x20-\x7E]/g, "");
+        } else {
+          cleanHeaders[key] = String(value);
+        }
+      }
+    }
+
     const response = await fetch(url, {
       method: 'POST',
-      headers: headers || {},
+      headers: cleanHeaders,
       body: JSON.stringify(body || {})
     });
     
@@ -49,8 +60,33 @@ app.post('/api/proxy', async (req, res) => {
       return res.status(response.status).json(errObj);
     }
     
-    const data = await response.json();
-    res.status(response.status).json(data);
+    // Copy headers from the downstream response
+    response.headers.forEach((value, name) => {
+      res.setHeader(name, value);
+    });
+    res.status(response.status);
+
+    if (response.body) {
+      const reader = response.body.getReader();
+      const push = async () => {
+        try {
+          while (true) {
+            const { done, value } = await reader.read();
+            if (done) {
+              res.end();
+              break;
+            }
+            res.write(value);
+          }
+        } catch (err: any) {
+          console.error("Error streaming to client:", err);
+          res.end();
+        }
+      };
+      push();
+    } else {
+      res.end();
+    }
   } catch (error: any) {
     res.status(500).json({ error: { message: `Proxy Error: ${error.message}` } });
   }

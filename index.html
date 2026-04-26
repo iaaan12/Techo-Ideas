@@ -2285,7 +2285,11 @@ Reglas hiper estrictas por formato:
           }, 300);
         } catch (error) {
           console.error(error);
-          errorMsg.textContent = `Error: ${error.message}. Revisá la configuración.`;
+          let errMsg = error.message;
+          if (errMsg.includes("Load failed") || errMsg.includes("Failed to fetch") || errMsg.includes("NetworkError") || errMsg.includes("pre-flight") || errMsg.includes("fetch failed") || errMsg.includes("The user aborted a request")) {
+             errMsg = "La conexión se interrumpió de forma inesperada. Esto puede suceder al cambiar de pestaña minimizando el navegador en tu celular.";
+          }
+          errorMsg.textContent = `Error: ${errMsg}. Revisá la conectividad y configuración.`;
           errorMsg.style.display = "block";
         } finally {
           clearInterval(loadingInterval);
