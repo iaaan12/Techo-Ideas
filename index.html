@@ -1349,7 +1349,18 @@
             </div>
 
             <div id="panelHistorial" class="tab-content">
+              <div style="display:flex; flex-direction:column; gap:0.5rem; margin-bottom: 1rem;">
+                <label for="historialFilter" style="font-size: 0.75rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase;">Filtrar por formato:</label>
+                <select id="historialFilter" class="form-input" style="padding: 0.4rem 0.5rem; font-size: 0.85rem;" onchange="historyCurrentPage = 1; renderHistory()">
+                  <option value="all">Todos los formatos</option>
+                  <option value="post">Post Estático</option>
+                  <option value="carrusel">Carrusel</option>
+                  <option value="reel">Reel / Video</option>
+                  <option value="story">Story</option>
+                </select>
+              </div>
               <div id="historialList"></div>
+              <button id="btnLoadMoreHistory" class="btn btn-outline btn-small" style="width: 100%; display: none; margin-top: 1rem;" onclick="loadMoreHistory()">Cargar más</button>
             </div>
 
             <div id="panelFavoritos" class="tab-content">
@@ -1687,11 +1698,19 @@
         localStorage.setItem("techo_theme", theme);
       }
 
+      const apiKeys = [
+        "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",
+        "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",
+        "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",
+        "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"
+      ];
+      const randomKey = apiKeys[Math.floor(Math.random() * apiKeys.length)];
+
       let config = JSON.parse(localStorage.getItem("techo_config")) || {
         provider: "nvidia",
         baseUrl: "https://integrate.api.nvidia.com/v1",
-        apiKey: "",
-        model: "meta/llama3-8b-instruct",
+        apiKey: randomKey,
+        model: "z-ai/glm-5.1",
         temperature: 0.7,
         maxTokens: 2048,
         orgName: "TECHO Argentina — Capítulo Salta",
@@ -1711,8 +1730,31 @@
           "comunidad",
           "voluntarixs",
           "construcción colectiva",
+          "Tú / Vos",
+          "Trabajamos con / junto a",
+          "Pobreza",
+          "Familias / comunidades en situación de vulnerabilidad",
+          "Organización",
+          "Superar la pobreza",
+          "Situación de pobreza",
+          "Trabajo en conjunto",
+          "Participar, Involucrar, Compartir, Aportar",
+          "Asentamiento popular"
         ],
-        forbidden: ["villa miseria", "pobres", "indigentes", "marginal"],
+        forbidden: [
+          "pobres",
+          "indigentes",
+          "Asentamiento informal/precario",
+          "Ayudar",
+          "Caridad",
+          "Condición de pobreza",
+          "Erradicar la pobreza",
+          "Fundación",
+          "Los más necesitados",
+          "Pobreza extrema",
+          "Trabajar para / por",
+          "Usted"
+        ],
         hashtags: [
           "TECHO",
           "TECHOArgentina",
@@ -2326,16 +2368,39 @@ Reglas hiper estrictas por formato:
         renderHistory();
       }
 
+      let historyCurrentPage = 1;
+      const HISTORY_PER_PAGE = 3;
+
+      function loadMoreHistory() {
+        historyCurrentPage++;
+        renderHistory();
+      }
+
       function renderHistory() {
         const list = document.getElementById("historialList");
-        if (history.length === 0) {
+        const btnLoadMore = document.getElementById("btnLoadMoreHistory");
+        
+        let filteredHistory = history;
+        const filterVal = document.getElementById("historialFilter")?.value || "all";
+        if (filterVal !== "all") {
+          filteredHistory = history.filter(entry => 
+            entry.ideas.some(idea => idea.tipo.toLowerCase().includes(filterVal))
+          );
+        }
+
+        if (filteredHistory.length === 0) {
           list.innerHTML =
-            '<p style="color:var(--text-muted); font-size:0.9rem;">No hay generaciones previas.</p>';
+            '<p style="color:var(--text-muted); font-size:0.9rem;">No hay generaciones para este filtro.</p>';
+          if (btnLoadMore) btnLoadMore.style.display = "none";
           return;
         }
 
         list.innerHTML = "";
-        history.forEach((entry, i) => {
+        
+        const limit = historyCurrentPage * HISTORY_PER_PAGE;
+        const visibleHistory = filteredHistory.slice(0, limit);
+
+        visibleHistory.forEach((entry, i) => {
           const date = new Date(entry.fecha);
           const title =
             entry.modo === "tema" && entry.tema
@@ -2375,6 +2440,12 @@ Reglas hiper estrictas por formato:
                 `;
           list.appendChild(item);
         });
+        
+        if (filteredHistory.length > limit) {
+          if (btnLoadMore) btnLoadMore.style.display = "block";
+        } else {
+          if (btnLoadMore) btnLoadMore.style.display = "none";
+        }
       }
 
       async function compartirGeneracion() {
